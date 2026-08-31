@@ -1,0 +1,2042 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Rota até o IELTS (offline)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#16213E;
+    --navy-deep:#0D1526;
+    --paper:#EEF1F5;
+    --card:#FFFFFF;
+    --amber:#F0A63A;
+    --amber-deep:#C9821F;
+    --teal:#2E8B7E;
+    --teal-deep:#20675D;
+    --ink:#1C2541;
+    --muted:#66707F;
+    --line:#DCE1E8;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html{-webkit-text-size-adjust:100%;}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;}
+  .app{max-width:920px;margin:0 auto;padding-bottom:calc(48px + env(safe-area-inset-bottom));}
+  h1,h2,h3{font-family:'Big Shoulders Display',sans-serif;font-weight:800;letter-spacing:0.01em;margin:0;}
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  button{font-family:inherit;}
+
+  .hero{background:linear-gradient(180deg,var(--navy) 0%,var(--navy-deep) 100%);color:#fff;
+    padding:calc(24px + env(safe-area-inset-top)) 20px 24px;border-radius:0 0 24px 24px;}
+  .hero-top{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap;}
+  .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:var(--amber);margin-bottom:6px;}
+  .hero h1{font-size:29px;line-height:1.05;color:#fff;}
+  .hero p.sub{color:#B9C2D6;font-size:13.5px;margin-top:8px;max-width:46ch;line-height:1.4;}
+  .exam-box{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.14);border-radius:14px;padding:10px 14px;min-width:150px;}
+  .exam-box label{display:block;font-size:10px;color:#9AA6BE;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;}
+  .exam-box input{background:transparent;border:none;color:#fff;font-family:'IBM Plex Mono',monospace;font-size:14px;width:100%;outline:none;}
+  .exam-box input::-webkit-calendar-picker-indicator{filter:invert(1);opacity:0.7;}
+  .countdown{margin-top:6px;font-family:'IBM Plex Mono',monospace;font-size:20px;color:var(--amber);}
+  .countdown span{font-size:10.5px;color:#9AA6BE;font-family:'Inter',sans-serif;text-transform:uppercase;letter-spacing:0.06em;margin-left:5px;}
+
+  .route-wrap{margin-top:24px;overflow-x:auto;padding-bottom:4px;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;}
+  .route-wrap::-webkit-scrollbar{display:none;}
+  .route{display:flex;align-items:center;min-width:680px;position:relative;}
+  .route::before{content:'';position:absolute;top:14px;left:0;right:0;height:2px;background:rgba(255,255,255,0.16);}
+  .stop{flex:1;display:flex;flex-direction:column;align-items:center;cursor:pointer;position:relative;z-index:1;padding:0 2px;scroll-snap-align:center;}
+  .stop-dot{width:30px;height:30px;border-radius:50%;border:2px solid rgba(255,255,255,0.3);background:var(--navy-deep);display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#9AA6BE;}
+  .stop.done .stop-dot{background:var(--teal);border-color:var(--teal);color:#fff;}
+  .stop.current .stop-dot{background:var(--amber);border-color:var(--amber);color:var(--navy-deep);box-shadow:0 0 0 4px rgba(240,166,58,0.25);}
+  .stop-label{font-size:9px;color:#8B96AE;margin-top:5px;text-align:center;line-height:1.2;max-width:60px;}
+  .stop.current .stop-label{color:var(--amber);font-weight:600;}
+
+  main{padding:22px 16px 0;}
+  section{margin-bottom:26px;}
+  .section-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:11px;gap:8px;flex-wrap:wrap;}
+  .section-head h2{font-size:20px;color:var(--navy);}
+  .section-head .tag{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--muted);background:var(--card);border:1px solid var(--line);padding:3px 9px;border-radius:20px;}
+  .section-sub{font-size:12.5px;color:var(--muted);margin:-6px 0 12px;line-height:1.4;}
+
+  .day-nav{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;}
+  .day-nav-btn{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--navy);font-size:17px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+  .day-nav-btn:active{background:var(--paper);}
+  .day-nav-center{flex:1;text-align:center;}
+  .day-nav-center .dnc-label{font-family:'Big Shoulders Display',sans-serif;font-size:17px;color:var(--navy);}
+  .day-nav-center .dnc-date{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);}
+  .today-jump{display:none;font-size:11px;color:var(--amber-deep);text-decoration:underline;background:none;border:none;margin-top:2px;cursor:pointer;}
+  .today-jump.show{display:inline-block;}
+
+  .ticket{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:0 1px 2px rgba(20,30,60,0.04);}
+  .ticket-head{background:var(--navy);color:#fff;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;}
+  .ticket-head .day-type{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--amber);text-transform:uppercase;letter-spacing:0.06em;}
+  .ticket-body{padding:4px 4px;}
+  .task{border-bottom:1px dashed var(--line);}
+  .task:last-child{border-bottom:none;}
+  .task-row{display:flex;align-items:flex-start;gap:12px;padding:13px 14px;cursor:pointer;}
+  .task input[type=checkbox]{appearance:none;width:23px;height:23px;min-width:23px;border:2px solid var(--line);border-radius:7px;margin-top:1px;cursor:pointer;position:relative;flex-shrink:0;}
+  .task input[type=checkbox]:checked{background:var(--teal);border-color:var(--teal);}
+  .task input[type=checkbox]:checked::after{content:'✓';position:absolute;top:-3px;left:4px;color:#fff;font-size:15px;font-weight:700;}
+  .task.optional input[type=checkbox]:checked{background:var(--amber);border-color:var(--amber);}
+  .task-text{flex:1;min-width:0;}
+  .task-title{font-size:14.5px;font-weight:600;color:var(--ink);}
+  .task.checked .task-title{text-decoration:line-through;color:var(--muted);}
+  .task-time{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--muted);margin-top:2px;}
+  .opt-pill{font-size:9.5px;background:#FBEFDD;color:var(--amber-deep);padding:2px 7px;border-radius:20px;margin-left:6px;font-weight:600;vertical-align:middle;}
+  .task-chev{color:var(--muted);font-size:12px;padding-top:4px;transition:transform .15s;flex-shrink:0;}
+  .task.open .task-chev{transform:rotate(180deg);}
+  .task-detail{max-height:0;overflow:hidden;transition:max-height .2s ease;}
+  .task.open .task-detail{max-height:320px;}
+  .task-detail-inner{padding:0 18px 14px 49px;font-size:12.5px;color:var(--muted);line-height:1.5;}
+  .task-detail-inner .featured{background:var(--paper);border-radius:10px;padding:10px 12px;margin-top:6px;color:var(--ink);font-weight:500;}
+  .task-detail-inner .featured .ft-tag{display:block;font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:var(--teal-deep);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:3px;font-weight:600;}
+  .task-detail-inner a.res-link{display:inline-flex;align-items:center;gap:5px;margin-top:8px;font-size:12px;font-weight:600;color:var(--teal-deep);text-decoration:none;}
+  .task-detail-inner a.res-link:after{content:'→';}
+
+  .ticket-foot{padding:12px 18px 16px;display:flex;align-items:center;gap:10px;}
+  .manual-complete-row{padding:0 18px 16px;border-top:1px dashed var(--line);}
+  .manual-complete-label{display:flex;align-items:flex-start;gap:9px;font-size:11.5px;color:var(--muted);line-height:1.4;cursor:pointer;padding-top:12px;}
+  .manual-complete-label input{width:19px;height:19px;min-width:19px;margin-top:1px;accent-color:var(--teal);}
+  .bar-track{flex:1;height:8px;background:var(--paper);border-radius:6px;overflow:hidden;}
+  .bar-fill{height:100%;background:var(--teal);border-radius:6px;transition:width .2s;}
+  .bar-pct{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);min-width:36px;text-align:right;}
+
+  .phase{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-bottom:9px;overflow:hidden;}
+  .phase-head{padding:13px 16px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;gap:10px;}
+  .phase-weeks{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--amber-deep);background:#FBEFDD;padding:3px 9px;border-radius:20px;white-space:nowrap;}
+  .phase-title{font-size:14.5px;font-weight:700;color:var(--navy);}
+  .phase-chev{color:var(--muted);transition:transform .15s;}
+  .phase.open .phase-chev{transform:rotate(180deg);}
+  .phase-body{max-height:0;overflow:hidden;transition:max-height .2s ease;}
+  .phase.open .phase-body{max-height:400px;}
+  .phase-body-inner{padding:0 16px 15px;font-size:13px;color:var(--muted);line-height:1.55;}
+
+  .daily-cards{display:grid;grid-template-columns:1fr;gap:10px;}
+  .daily-card{background:var(--navy);color:#fff;border-radius:14px;padding:16px;cursor:pointer;position:relative;}
+  .daily-card .dc-tag{font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:var(--amber);text-transform:uppercase;letter-spacing:0.08em;}
+  .daily-card .dc-front{font-size:15.5px;font-weight:600;margin-top:6px;line-height:1.4;}
+  .daily-card .dc-back{font-size:12.5px;color:#D9E0EC;margin-top:6px;line-height:1.5;display:none;}
+  .daily-card.flipped .dc-front{display:none;}
+  .daily-card.flipped .dc-back{display:block;}
+  .daily-card .dc-hint{font-size:9.5px;color:#8B96AE;text-transform:uppercase;letter-spacing:0.05em;margin-top:10px;display:flex;justify-content:space-between;align-items:center;}
+  .speak-btn{background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.25);color:#fff;width:30px;height:30px;border-radius:50%;font-size:14px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+  .dc-actions{display:flex;gap:6px;}
+  .speak-btn:active{background:var(--amber);border-color:var(--amber);}
+  .speak-btn.light{background:var(--paper);border:1px solid var(--line);color:var(--navy);}
+
+  .explore-toggle{margin-top:12px;text-align:center;}
+  .explore-toggle button{background:none;border:1px solid var(--line);color:var(--navy);font-size:12.5px;font-weight:600;padding:9px 16px;border-radius:20px;cursor:pointer;}
+  .explore-wrap{display:none;margin-top:12px;}
+  .explore-wrap.show{display:block;}
+  .deck-toggle{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;}
+  .deck-btn{font-size:12.5px;font-weight:600;padding:8px 13px;border-radius:20px;border:1px solid var(--line);background:var(--card);color:var(--muted);cursor:pointer;}
+  .deck-btn.active{background:var(--navy);color:#fff;border-color:var(--navy);}
+  .flash-wrap{display:flex;align-items:center;gap:10px;}
+  .flash-nav{width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--navy);font-size:16px;cursor:pointer;flex-shrink:0;}
+  .flashcard{flex:1;background:var(--card);border:1px solid var(--line);color:var(--ink);border-radius:14px;min-height:120px;display:flex;align-items:center;justify-content:center;text-align:center;padding:20px;cursor:pointer;position:relative;}
+  .flashcard .fc-count{position:absolute;top:10px;right:14px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--muted);}
+  .fc-front{font-size:16px;font-weight:600;line-height:1.4;}
+  .fc-back{font-size:13.5px;color:var(--muted);line-height:1.5;}
+
+  .heat-row{display:flex;gap:5px;flex-wrap:wrap;}
+  .heat-cell{width:28px;height:28px;border-radius:8px;background:var(--line);display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--muted);}
+  .heat-cell.full{background:var(--teal);color:#fff;}
+  .heat-cell.partial{background:#FBEFDD;color:var(--amber-deep);}
+  .streak{display:flex;gap:14px;margin-top:14px;flex-wrap:wrap;}
+  .streak-item{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:11px 16px;text-align:center;flex:1;min-width:96px;}
+  .streak-item .num{font-family:'Big Shoulders Display',sans-serif;font-size:25px;color:var(--navy);}
+  .streak-item .lbl{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:0.04em;}
+
+  .reset-link{text-align:center;margin-top:22px;}
+  .reset-link button{background:none;border:none;color:var(--muted);font-size:12px;text-decoration:underline;cursor:pointer;}
+
+  .save-toast{position:fixed;left:16px;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));
+    background:var(--navy-deep);color:#fff;border-radius:12px;padding:12px 16px;font-size:12.5px;
+    display:none;align-items:center;justify-content:space-between;gap:10px;z-index:50;box-shadow:0 6px 18px rgba(0,0,0,0.25);}
+  .save-toast.show{display:flex;}
+  .save-toast button{background:var(--amber);color:var(--navy-deep);border:none;font-size:12px;font-weight:700;padding:7px 12px;border-radius:8px;cursor:pointer;flex-shrink:0;}
+
+  /* FORMS / LISTS (meus cards, dúvidas) */
+  .form-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;}
+  .form-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;}
+  .form-input{flex:1;min-width:140px;border:1px solid var(--line);border-radius:10px;padding:11px 12px;font-size:14px;font-family:'Inter',sans-serif;background:var(--paper);color:var(--ink);}
+  .form-input:focus{outline:2px solid var(--amber);outline-offset:1px;}
+  textarea.form-input{resize:vertical;min-height:44px;width:100%;}
+  .add-btn{background:var(--navy);color:#fff;border:none;border-radius:10px;padding:11px 16px;font-size:13.5px;font-weight:600;cursor:pointer;white-space:nowrap;}
+  .add-btn:active{background:var(--navy-deep);}
+  .item-list{margin-top:12px;display:flex;flex-direction:column;gap:8px;}
+  .list-item{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:11px 13px;display:flex;align-items:flex-start;gap:10px;}
+  .list-item-text{flex:1;min-width:0;}
+  .list-item-front{font-size:14px;font-weight:600;color:var(--ink);}
+  .list-item-back{font-size:12px;color:var(--muted);margin-top:2px;}
+  .list-item-date{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);margin-top:3px;}
+  .list-item.resolved .list-item-front{text-decoration:line-through;color:var(--muted);}
+  .list-item-actions{display:flex;gap:6px;flex-shrink:0;}
+  .icon-btn{width:32px;height:32px;border-radius:8px;border:1px solid var(--line);background:var(--paper);color:var(--navy);font-size:13px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+  .icon-btn.danger{color:#B4463A;}
+  .empty-state{text-align:center;color:var(--muted);font-size:12.5px;padding:16px;}
+
+  /* PRACTICE / RANDOM TOPIC TIMER */
+  .practice-card{background:var(--navy);color:#fff;border-radius:16px;padding:20px;text-align:center;}
+  .practice-topic{font-size:16.5px;font-weight:600;line-height:1.4;min-height:46px;display:flex;align-items:center;justify-content:center;padding:0 6px;}
+  .practice-topic.placeholder{color:#8B96AE;font-weight:400;font-size:13.5px;}
+  .shuffle-btn{margin-top:12px;background:var(--amber);color:var(--navy-deep);border:none;border-radius:20px;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;}
+  .chip-row{display:flex;gap:8px;justify-content:center;margin-top:16px;flex-wrap:wrap;}
+  .chip{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.2);color:#D9E0EC;border-radius:20px;padding:6px 13px;font-size:12px;cursor:pointer;}
+  .chip.active{background:var(--amber);color:var(--navy-deep);border-color:var(--amber);font-weight:700;}
+  .timer-display{font-family:'IBM Plex Mono',monospace;font-size:44px;color:#fff;margin-top:14px;letter-spacing:0.02em;}
+  .timer-display.done{color:var(--amber);}
+  .timer-controls{display:flex;gap:10px;justify-content:center;margin-top:12px;}
+  .timer-btn{border:none;border-radius:20px;padding:10px 20px;font-size:13px;font-weight:700;cursor:pointer;}
+  .timer-btn.primary{background:var(--teal);color:#fff;}
+  .timer-btn.secondary{background:rgba(255,255,255,0.1);color:#fff;border:1px solid rgba(255,255,255,0.2);}
+
+  /* SIMULADO COMPLETO */
+  .mock-intro{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;text-align:center;}
+  .mock-intro .mi-steps{display:flex;justify-content:center;gap:18px;margin:14px 0;flex-wrap:wrap;}
+  .mock-intro .mi-step{font-size:11.5px;color:var(--muted);text-align:center;}
+  .mock-intro .mi-step b{display:block;font-family:'Big Shoulders Display',sans-serif;font-size:20px;color:var(--navy);}
+  .mock-start-btn{background:var(--navy);color:#fff;border:none;border-radius:20px;padding:12px 22px;font-size:14px;font-weight:700;cursor:pointer;margin-top:6px;}
+  .mock-run{background:var(--navy);color:#fff;border-radius:16px;padding:22px 20px;text-align:center;}
+  .mock-phase-tag{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--amber);text-transform:uppercase;letter-spacing:0.08em;}
+  .mock-phase-sub{font-size:11px;color:#9AA6BE;margin-top:3px;}
+  .mock-q{font-size:17px;font-weight:600;margin-top:14px;line-height:1.4;min-height:48px;display:flex;align-items:center;justify-content:center;}
+  .mock-timer{font-family:'IBM Plex Mono',monospace;font-size:38px;color:#fff;margin-top:12px;}
+  .mock-timer.warn{color:var(--amber);}
+  .mock-controls{display:flex;gap:10px;justify-content:center;margin-top:14px;flex-wrap:wrap;}
+  .mock-progress-dots{display:flex;justify-content:center;gap:5px;margin-top:14px;}
+  .mock-dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.25);}
+  .mock-dot.done{background:var(--teal);}
+  .mock-dot.active{background:var(--amber);}
+  .mock-done{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:26px 20px;text-align:center;}
+  .mock-done .big-check{font-size:36px;}
+
+  /* WRITING */
+  .chip-light{background:var(--card);border:1px solid var(--line);color:var(--muted);border-radius:20px;padding:7px 14px;font-size:12.5px;cursor:pointer;}
+  .chip-light.active{background:var(--navy);color:#fff;border-color:var(--navy);font-weight:700;}
+  .writing-wrap{margin-top:14px;}
+  .wr-prompt-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;}
+  .wr-prompt-type{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--amber-deep);background:#FBEFDD;padding:3px 9px;border-radius:20px;text-transform:uppercase;letter-spacing:0.05em;display:inline-block;}
+  .wr-prompt-text{font-size:14.5px;font-weight:600;color:var(--ink);margin-top:10px;line-height:1.5;}
+  .wr-data-table{width:100%;border-collapse:collapse;margin-top:10px;font-size:12.5px;}
+  .wr-data-table th,.wr-data-table td{border:1px solid var(--line);padding:6px 8px;text-align:left;}
+  .wr-data-table th{background:var(--paper);font-weight:700;}
+  .wr-shuffle-btn{background:var(--navy);color:#fff;border:none;border-radius:20px;padding:9px 16px;font-size:12.5px;font-weight:700;cursor:pointer;margin-top:12px;}
+  .wr-timer-row{display:flex;align-items:center;justify-content:center;gap:14px;margin:16px 0;}
+  .wr-timer{font-family:'IBM Plex Mono',monospace;font-size:32px;color:var(--navy);}
+  .wr-timer.warn{color:#C1503F;}
+  .wr-textarea{width:100%;min-height:220px;border:1px solid var(--line);border-radius:12px;padding:14px;font-size:14.5px;font-family:'Inter',sans-serif;color:var(--ink);resize:vertical;}
+  .wr-textarea:focus{outline:2px solid var(--amber);outline-offset:1px;}
+  .wr-meta-row{display:flex;justify-content:space-between;align-items:center;margin-top:8px;flex-wrap:wrap;gap:8px;}
+  .wr-word-count{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);}
+  .wr-word-count.ok{color:var(--teal-deep);font-weight:700;}
+  .wr-actions{display:flex;gap:8px;}
+  .wr-checklist{background:var(--paper);border-radius:12px;padding:14px;margin-top:14px;}
+  .wr-checklist-item{display:flex;align-items:flex-start;gap:9px;font-size:12.5px;color:var(--ink);padding:6px 0;}
+  .wr-checklist-item input{width:18px;height:18px;min-width:18px;margin-top:1px;accent-color:var(--teal);}
+  .wr-saved-list{margin-top:16px;}
+
+  /* PUZZLES */
+  .puzzle-wrap{margin-top:14px;}
+  .memory-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+  .memory-card{aspect-ratio:1/1;background:var(--navy);border-radius:10px;display:flex;align-items:center;justify-content:center;
+    text-align:center;padding:6px;font-size:11.5px;font-weight:600;color:#fff;cursor:pointer;user-select:none;}
+  .memory-card.revealed{background:var(--card);border:1px solid var(--amber);color:var(--ink);}
+  .memory-card.matched{background:#E4F2EF;border:1px solid var(--teal);color:var(--teal-deep);}
+  .memory-card.hidden-face{font-size:18px;}
+  .puzzle-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;font-size:12px;color:var(--muted);}
+  .ws-grid{display:grid;gap:2px;margin-top:12px;max-width:100%;overflow-x:auto;}
+  .ws-cell{aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;
+    font-size:12px;font-weight:700;background:var(--card);border:1px solid var(--line);border-radius:4px;cursor:pointer;color:var(--ink);user-select:none;}
+  .ws-cell.selected{background:#FBEFDD;border-color:var(--amber);}
+  .ws-cell.found{background:#E4F2EF;border-color:var(--teal);color:var(--teal-deep);}
+  .ws-words-row{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px;}
+  .ws-word-chip{font-size:11.5px;background:var(--paper);border:1px solid var(--line);border-radius:20px;padding:4px 10px;color:var(--muted);}
+  .ws-word-chip.found{background:#E4F2EF;border-color:var(--teal);color:var(--teal-deep);text-decoration:line-through;}
+
+  /* SRS REVIEW (estilo Anki) */
+  .srs-card-wrap{display:flex;flex-direction:column;gap:12px;}
+  .srs-card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:26px 20px;min-height:150px;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;position:relative;}
+  .srs-source-tag{position:absolute;top:12px;left:14px;font-family:'IBM Plex Mono',monospace;font-size:9.5px;
+    color:var(--teal-deep);background:#E4F2EF;padding:3px 8px;border-radius:20px;text-transform:uppercase;letter-spacing:0.05em;}
+  .srs-front{font-size:18px;font-weight:600;color:var(--ink);line-height:1.4;margin-top:14px;}
+  .srs-back{font-size:14.5px;color:var(--muted);line-height:1.5;margin-top:10px;}
+  .srs-show-btn{margin-top:16px;background:var(--navy);color:#fff;border:none;border-radius:20px;padding:11px 22px;font-size:13.5px;font-weight:700;cursor:pointer;}
+  .srs-rate-row{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;}
+  .srs-rate-btn{border:none;border-radius:12px;padding:12px 6px;font-size:12px;font-weight:700;cursor:pointer;color:#fff;line-height:1.3;}
+  .srs-rate-btn small{display:block;font-weight:500;font-size:9.5px;opacity:0.85;margin-top:2px;}
+  .srs-rate-btn.again{background:#C1503F;}
+  .srs-rate-btn.hard{background:#D08A3E;}
+  .srs-rate-btn.good{background:var(--teal);}
+  .srs-rate-btn.easy{background:#3E7FC1;}
+  .srs-progress{font-size:11.5px;color:var(--muted);text-align:center;}
+  .srs-empty{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:26px 20px;text-align:center;}
+  .srs-empty .big-check{font-size:34px;}
+  .srs-empty p{color:var(--muted);font-size:13px;margin:8px 0 14px;}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="hero">
+    <div class="hero-top">
+      <div>
+        <div class="eyebrow">Curso pessoal · 12 semanas</div>
+        <h1>Rota até o IELTS</h1>
+        <p class="sub">Foco em destravar o Speaking. Cada parada é uma semana da sua jornada.</p>
+      </div>
+      <div class="exam-box">
+        <label>Data da prova</label>
+        <input type="date" id="examDateInput">
+        <div class="countdown" id="countdownNum">--<span>dias</span></div>
+      </div>
+    </div>
+    <div class="route-wrap">
+      <div class="route" id="routeLine"></div>
+    </div>
+  </div>
+
+  <main>
+
+    <section id="today-section">
+      <div class="section-head"><h2>Ficha do dia</h2></div>
+      <div class="day-nav">
+        <button class="day-nav-btn" id="dayPrev">‹</button>
+        <div class="day-nav-center">
+          <div class="dnc-label" id="dayName">--</div>
+          <div class="dnc-date mono" id="todayDate">--</div>
+          <button class="today-jump" id="jumpToday">voltar para hoje</button>
+        </div>
+        <button class="day-nav-btn" id="dayNext">›</button>
+      </div>
+      <div class="ticket">
+        <div class="ticket-head">
+          <span class="day-type" id="dayType">--</span>
+        </div>
+        <div class="ticket-body" id="taskList"></div>
+        <div class="ticket-foot">
+          <div class="bar-track"><div class="bar-fill" id="dayBar" style="width:0%"></div></div>
+          <div class="bar-pct" id="dayPct">0%</div>
+        </div>
+        <div class="manual-complete-row">
+          <label class="manual-complete-label">
+            <input type="checkbox" id="manualCompleteCheck">
+            <span>Marcar este dia como concluído mesmo assim (dia adaptado, viagem, imprevisto...)</span>
+          </label>
+        </div>
+      </div>
+    </section>
+
+    </section>
+
+    <section id="roadmap-section">
+      <div class="section-head"><h2>Roteiro completo</h2></div>
+      <div id="phasesWrap"></div>
+    </section>
+
+    <section id="flashcards-section">
+      <div class="section-head"><h2>Cartões do dia</h2></div>
+      <p class="section-sub">Um chunk, um tema de Speaking Part 2 e uma palavra/expressão essencial novos a cada dia — 150+ no total, sem repetir por semanas.</p>
+      <div class="daily-cards">
+        <div class="daily-card" id="dailyChunk"></div>
+        <div class="daily-card" id="dailyTema"></div>
+        <div class="daily-card" id="dailyVocab"></div>
+      </div>
+      <div class="explore-toggle"><button id="exploreBtn">Explorar todos os cartões</button></div>
+      <div class="explore-wrap" id="exploreWrap">
+        <div class="deck-toggle">
+          <button class="deck-btn active" data-deck="chunks">Chunks (50)</button>
+          <button class="deck-btn" data-deck="temas">Temas Part 2 (50)</button>
+          <button class="deck-btn" data-deck="vocab">Vocabulário essencial (150)</button>
+          <button class="deck-btn" data-deck="mycards" id="myCardsDeckBtn">Meus cards (0)</button>
+        </div>
+        <div class="flash-wrap">
+          <button class="flash-nav" id="fcPrev">‹</button>
+          <div class="flashcard" id="flashcard">
+            <span class="fc-count" id="fcCount">1/50</span>
+            <span style="position:absolute;top:10px;left:14px;display:flex;gap:6px;">
+              <button class="speak-btn light" id="fcSpeak" aria-label="Ouvir pronúncia">🔊</button>
+              <button class="speak-btn light" id="fcYouglish" aria-label="Ver no YouGlish">🎬</button>
+            </span>
+            <div id="fcContent"></div>
+          </div>
+          <button class="flash-nav" id="fcNext">›</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="srs-section">
+      <div class="section-head">
+        <h2>Revisão</h2>
+        <span class="tag mono" id="srsDueTag">0 pra hoje</span>
+      </div>
+      <p class="section-sub">Junta os seus cards, os chunks e as palavras/expressões já vistas. Você avalia cada card e ele volta a aparecer no tempo certo pra fixar de verdade — igual Anki.</p>
+      <div class="srs-card-wrap" id="srsWrap"></div>
+    </section>
+
+    <section id="mock-section">
+      <div class="section-head"><h2>Simulado completo</h2></div>
+      <p class="section-sub">Part 1, Part 2 e Part 3 seguidas, com os tempos reais da prova — pra treinar como se fosse o dia do exame, não como quem está começando do zero.</p>
+      <div class="mock-wrap" id="mockWrap"></div>
+    </section>
+
+    <section id="practice-section">
+      <div class="section-head"><h2>Fale agora</h2></div>
+      <p class="section-sub">Sorteia um tema e cronometra sua fala — treino rápido pra qualquer hora livre do dia.</p>
+      <div class="practice-card">
+        <div class="practice-topic placeholder" id="practiceTopic">Toque em "Sortear tema" pra começar</div>
+        <button class="shuffle-btn" id="shuffleBtn">🎲 Sortear tema</button>
+        <div class="chip-row" id="durationChips">
+          <button class="chip" data-secs="60">1 min</button>
+          <button class="chip active" data-secs="120">2 min</button>
+          <button class="chip" data-secs="180">3 min</button>
+        </div>
+        <div class="timer-display" id="timerDisplay">02:00</div>
+        <div class="timer-controls">
+          <button class="timer-btn primary" id="timerStart">Começar</button>
+          <button class="timer-btn secondary" id="timerReset">Reiniciar</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="mycards-section">
+      <div class="section-head"><h2>Meus cards</h2></div>
+      <p class="section-sub">Adicione palavras ou frases que você quer fixar — elas entram no seu baralho pessoal, com áudio.</p>
+      <div class="form-card">
+        <div class="form-row">
+          <input class="form-input" id="myCardFront" type="text" placeholder="Palavra ou frase em inglês">
+        </div>
+        <div class="form-row">
+          <input class="form-input" id="myCardBack" type="text" placeholder="Tradução ou nota (opcional)">
+          <button class="add-btn" id="addMyCardBtn">Adicionar</button>
+        </div>
+      </div>
+      <div class="item-list" id="myCardsList"></div>
+    </section>
+
+    <section id="doubts-section">
+      <div class="section-head"><h2>Minhas dúvidas</h2></div>
+      <p class="section-sub">Anote dúvidas que surgirem no dia a dia pra revisar com calma ou perguntar ao professor.</p>
+      <div class="form-card">
+        <div class="form-row">
+          <textarea class="form-input" id="doubtInput" placeholder="Ex: quando uso 'used to' vs 'would' pra hábitos passados?"></textarea>
+        </div>
+        <div class="form-row" style="justify-content:flex-end;">
+          <button class="add-btn" id="addDoubtBtn">Adicionar dúvida</button>
+        </div>
+      </div>
+      <div class="item-list" id="doubtsList"></div>
+    </section>
+
+    <section id="writing-section">
+      <div class="section-head"><h2>Writing</h2></div>
+      <p class="section-sub">Task 1 (20 min) e Task 2 (40 min), com cronômetro real, contador de palavras e checklist de autoavaliação.</p>
+      <div class="chip-row" id="writingTaskChips" style="justify-content:flex-start;margin-top:0;">
+        <button class="chip-light wr-chip active" data-task="1">Task 1</button>
+        <button class="chip-light wr-chip" data-task="2">Task 2</button>
+      </div>
+      <div class="writing-wrap" id="writingWrap"></div>
+    </section>
+
+    <section id="puzzles-section">
+      <div class="section-head"><h2>Puzzles</h2></div>
+      <p class="section-sub">Revisão mais leve do vocabulário, em formato de jogo.</p>
+      <div class="chip-row" id="puzzleTypeChips" style="justify-content:flex-start;margin-top:0;">
+        <button class="chip-light pz-chip active" data-game="memory">Jogo da memória</button>
+        <button class="chip-light pz-chip" data-game="wordsearch">Caça-palavras</button>
+      </div>
+      <div class="puzzle-wrap" id="puzzleWrap"></div>
+    </section>
+
+    <section id="progress-section">
+      <div class="section-head"><h2>Últimos 14 dias</h2></div>
+      <div class="heat-row" id="heatRow"></div>
+      <div class="streak">
+        <div class="streak-item"><div class="num" id="streakNum">0</div><div class="lbl">dias seguidos</div></div>
+        <div class="streak-item"><div class="num" id="weekNum">1</div><div class="lbl">semana atual</div></div>
+        <div class="streak-item"><div class="num" id="totalDone">0</div><div class="lbl">tarefas feitas</div></div>
+      </div>
+    </section>
+
+    <div class="reset-link"><button id="resetBtn">Reiniciar todos os dados salvos</button></div>
+
+  </main>
+</div>
+
+<div class="save-toast" id="saveToast">
+  <span>Não consegui salvar seu progresso neste navegador (isso é comum em modo de navegação privada/anônima). O que você marcou continua na tela por enquanto.</span>
+  <button id="retrySaveBtn">Tentar de novo</button>
+</div>
+
+<script>
+(function(){
+  const STORAGE_KEY = 'ingles-course-data-offline-v1';
+  const PT_DAYS = ['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
+  const PT_DAYS_SHORT = ['dom','seg','ter','qua','qui','sex','sáb'];
+
+  function fmtDate(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+  function dateOnly(d){ const nd=new Date(d); nd.setHours(0,0,0,0); return nd; }
+  function addDays(d,n){ const nd=new Date(d); nd.setDate(nd.getDate()+n); return nd; }
+  function sameDay(a,b){ return fmtDate(a)===fmtDate(b); }
+
+  const today = dateOnly(new Date());
+  let selectedDate = dateOnly(new Date());
+
+  let programStart = dateOnly(new Date());
+  const wd = programStart.getDay();
+  programStart = wd===1 ? programStart : addDays(programStart, wd<=1 ? (1-wd) : (8-wd));
+
+  const RES = {
+    britishcouncil: {label:'British Council · Learn English', url:'https://learnenglish.britishcouncil.org/'},
+    ieltsliz: {label:'IELTS Liz — dicas de Speaking', url:'https://ieltsliz.com/'},
+    bne: {label:'Breaking News English', url:'https://breakingnewsenglish.com/'},
+    elllo: {label:'ELLLO — áudios por nível', url:'https://elllo.org/'},
+    bbclive: {label:'BBC 6 Minute English — página ao vivo', url:'https://www.bbc.co.uk/learningenglish/'},
+  };
+
+  // Episódios reais do BBC 6 Minute English, um por semana (a BBC publica um novo por semana).
+  // Semanas 1-7 usam episódios já publicados e confirmados. A partir da semana 8, a BBC ainda
+  // não tinha publicado o episódio (eles saem semana a semana), então aponto pra página ao vivo:
+  // sempre pegue o mais recente disponível quando chegar nessa semana.
+  const WEEKLY_EPISODES = [
+    {title:'Should we cycle more?', url:'https://www.bbc.co.uk/learningenglish/english/features/6-minute-english_2026/ep-260709'},
+    {title:"What's in a footballer's brain?", url:'https://www.bbc.co.uk/learningenglish/english/features/6-minute-english_2026/ep-260716'},
+    {title:'Growing up in a warzone', url:'https://www.bbc.co.uk/learningenglish/english/features/6-minute-english_2026/ep-260723'},
+    {title:'The Enhanced Games: should athletes be allowed to use drugs?', url:'https://www.bbc.co.uk/learningenglish/english/features/6-minute-english_2026/ep-260730'},
+    {title:"Predicting climate change's future impact", url:'https://www.bbc.co.uk/learningenglish/english/features/6-minute-english_2026/ep-260806'},
+    {title:'Household chores: who does the most?', url:'https://www.bbc.co.uk/learningenglish/english/features/6-minute-english_2026/ep-260813'},
+    {title:'Sharing the road with driverless cars', url:'https://www.bbc.co.uk/learningenglish/english/features/6-minute-english_2026/ep-260820'},
+    {title:'Episódio mais recente da semana', url:RES.bbclive.url, fallback:true},
+    {title:'Episódio mais recente da semana', url:RES.bbclive.url, fallback:true},
+    {title:'Episódio mais recente da semana', url:RES.bbclive.url, fallback:true},
+    {title:'Episódio mais recente da semana', url:RES.bbclive.url, fallback:true},
+    {title:'Episódio mais recente da semana', url:RES.bbclive.url, fallback:true},
+  ];
+
+  const TASKS = {
+    work: [
+      {id:'leitura_ida', title:'Leitura no ônibus (ida)', time:'20 min · ida ao trabalho',
+        tip:'Leia sem parar pra traduzir cada palavra — o objetivo é pegar o sentido geral e vocabulário novo no contexto. Escolha o nível 0-2 no Breaking News English se ainda estiver pesado.', res:'bne'},
+      {id:'shadow', title:'Shadowing — repetir junto com áudio', time:'15 min · 11h–12h', useEpisode:true,
+        tip:'Ouça o episódio da semana (mesmo áudio a semana toda, pra fixar) e repita junto, quase em cima da fala, imitando ritmo e entonação — não pause pra entender cada palavra.'},
+      {id:'fala_gravada', title:'Fala gravada sobre um tema', time:'25 min · 11h–12h', useTema:true,
+        tip:'Fale por 2 minutos sobre o tema abaixo, grave, ouça e fale de novo tentando melhorar.'},
+      {id:'revisao_chunks', title:'Revisão de chunks e pontos cegos', time:'20 min · 11h–12h', useChunk:true,
+        tip:'Pratique o chunk de hoje em 3 frases suas, e revise as frases que travaram no seu dia a dia.'},
+      {id:'volta_onibus', title:'Ônibus volta: repita o episódio da semana', time:'20 min · volta do trabalho', useEpisode:true,
+        tip:'Segunda escuta do mesmo episódio de hoje — está tudo bem só absorver aqui, sem se cobrar a produzir.'},
+      {id:'serie', title:'Série com legenda em inglês', time:'noite · input passivo',
+        tip:'Troque a legenda de português pra inglês — conecta som e escrita sem parar a imersão.'},
+      {id:'duolingo', title:'Duolingo', time:'10–15 min · à noite', optional:true,
+        tip:'Sem pressa — esse é o seu momento de lazer com propósito.'},
+    ],
+    tuesday: [
+      {id:'aquecimento', title:'Aquecimento: falar sozinho antes do pub', time:'10 min',
+        tip:'Fale sozinho sobre o que fez na semana — isso "liga" o modo fala antes da conversa real.'},
+      {id:'aula_ter', title:'Aula com o professor', time:'1h',
+        tip:'Peça pro professor focar em Speaking Parts 2 e 3 essa semana — é onde mais trava.', res:'ieltsliz'},
+      {id:'pub', title:'English Exchange no pub', time:'1h30',
+        tip:'Puxe assunto com uma pergunta aberta e deixe a pessoa falar primeiro — isso tira a pressão de você.'},
+      {id:'duolingo_ter', title:'Duolingo', time:'opcional', optional:true, tip:'Se der vontade, sem culpa.'},
+    ],
+    saturday: [
+      {id:'aula_sab', title:'Aula com o professor', time:'2h',
+        tip:'Quando estiver mais perto de dezembro, aproveite pra simular a prova completa.', res:'ieltsliz'},
+      {id:'consolidacao', title:'Consolidação pós-aula: revisar e gravar', time:'30 min · logo após a aula',
+        tip:'Grave-se repetindo os pontos que o professor corrigiu, enquanto ainda está fresco na memória.'},
+      {id:'duolingo_sab', title:'Duolingo', time:'opcional', optional:true, tip:'Se der vontade, sem culpa.'},
+    ]
+  };
+
+  function dayTypeFor(date){ const dow=date.getDay(); if(dow===2) return 'tuesday'; if(dow===6) return 'saturday'; return 'work'; }
+  function dayTypeLabel(t){ return t==='tuesday' ? 'Folga · Aula + Pub' : t==='saturday' ? 'Folga · Aula' : 'Dia de trabalho'; }
+
+  const PHASES = [
+    {weeks:'Semanas 1–4', title:'Construir automatismo', text:'Narração mental diária descrevendo o que você está fazendo. Shadowing 15 min/dia com o episódio da semana. Grave-se falando 1 min sobre temas aleatórios todo dia, sem parar pra corrigir — o objetivo é tirar a tradução mental do caminho.'},
+    {weeks:'Semanas 5–8', title:'Chunks e estrutura do IELTS Speaking', text:'Aprofunde os chunks de conexão e opinião. Estude a fundo os formatos das Parts 1, 2 e 3 com seu professor. Pratique a Part 2 cronometrada toda semana — é a que mais expõe travamentos.'},
+    {weeks:'Semanas 9–11', title:'Simulações sob pressão', text:'Simulados completos de Speaking, cronometrados, como no exame real. Grave e reescute — identifique onde você trava ou hesita, não apenas palavras isoladas. Continue os parceiros de conversação focando em fluência, não correção imediata.'},
+    {weeks:'Semana 12', title:'Ajuste fino, não sobrecarga', text:'Reduza estudo novo. Foque em revisar chunks que já domina, simulados leves, sono bom e controle de ansiedade. Nessa fase, mais conteúdo novo tende a gerar ansiedade sem agregar muito.'},
+  ];
+
+  // Perguntas típicas de Part 1 (perguntas pessoais rápidas, sem preparo) e Part 3
+  // (perguntas mais abstratas/opinativas, geralmente ligadas ao tema da Part 2).
+  // O formato do IELTS Speaking é sempre "aberto" — não existe uma lista oficial fixa,
+  // então este é um banco representativo do estilo e nível de pergunta que cai na prova.
+  const PART1_QUESTIONS = [
+    "What's your full name?","Do you work or are you a student?","What do you like about your job?",
+    "Do you use public transport often?","What's your hometown like?","Do you prefer mornings or evenings?",
+    "What do you usually do on weekends?","Do you enjoy cooking?","What kind of music do you like?",
+    "Do you read much in your free time?","What's the weather like in your country?",
+    "Do you like trying new restaurants?","How do you usually spend your evenings?",
+    "Do you prefer living in a city or the countryside?","What do you do to relax after work?",
+    "Do you often use social media?","What's your favourite season of the year?",
+    "Do you enjoy shopping?","How often do you see your friends?","Do you like watching films or series?",
+    "What's your favourite place in your hometown?","Do you exercise regularly?",
+    "How do you usually travel to work?","Do you like planning things in advance?",
+    "What did you do last weekend?","Do you prefer texting or calling people?",
+    "What's a typical breakfast in your country?","Do you enjoy learning new skills?",
+    "How important is punctuality to you?","Do you like spending time outdoors?",
+  ];
+
+  const PART3_QUESTIONS = [
+    "Do you think technology has made people less social?","How has education changed in the last twenty years?",
+    "Why do you think some people prefer working from home?","Do you think cities will become more crowded in the future?",
+    "What are the advantages and disadvantages of social media?","How does culture influence the way people communicate?",
+    "Do you think younger and older generations have different values?","Why is it important for children to learn a second language?",
+    "How might climate change affect the way people travel?","Do you think advertising influences people too much?",
+    "What role does technology play in modern education?","Why do some people find it hard to balance work and personal life?",
+    "Do you think traditions are still important nowadays?","How do you think jobs will change in the next twenty years?",
+    "Why do people from different countries have different attitudes to time?","Do you think it's better to specialise in one skill or have many?",
+    "How does the media influence public opinion?","Do you think material possessions make people happier?",
+    "Why do you think tourism has increased so much in recent years?","How can governments encourage people to be more environmentally friendly?",
+    "Do you think remote work will continue to grow?","Why is it important to preserve historical buildings?",
+    "How do you think artificial intelligence will change everyday life?","Do you think competition is a good way to motivate people?",
+    "Why do some people struggle to adapt to a new country?","How important is it for a country to protect its own culture?",
+    "Do you think online learning is as effective as classroom learning?","What can be done to reduce traffic in big cities?",
+    "Do you think people rely too much on their phones?","How can businesses encourage a healthier work-life balance?",
+  ];
+
+  // ---- Writing: bancos de temas (Task 1 e Task 2) ----
+  const TASK1_LETTERS = [
+    {register:'Formal', prompt:'Write a letter to your landlord explaining a problem with your accommodation and asking for it to be fixed.'},
+    {register:'Semi-formal', prompt:'Write a letter to your employer requesting a few days off work and explaining the reason.'},
+    {register:'Informal', prompt:'Write a letter to a friend inviting them to visit you in Ireland and suggesting things to do together.'},
+    {register:'Formal', prompt:'Write a letter to a company complaining about a faulty product you purchased online.'},
+    {register:'Semi-formal', prompt:'Write a letter to your English teacher explaining why you missed a class and asking for the material you missed.'},
+    {register:'Informal', prompt:'Write a letter to a family member telling them about a recent change in your life.'},
+    {register:'Formal', prompt:'Write a letter to your local council reporting a problem in your neighbourhood and suggesting a solution.'},
+    {register:'Semi-formal', prompt:'Write a letter to a former colleague asking for a reference for a new job application.'},
+    {register:'Informal', prompt:'Write a letter to a friend describing your first few months living in a new country.'},
+    {register:'Formal', prompt:'Write a letter to a hotel manager complaining about your stay and requesting a refund.'},
+    {register:'Semi-formal', prompt:'Write a letter to your bank explaining an issue with your account and asking for it to be resolved.'},
+    {register:'Informal', prompt:'Write a letter to a friend asking for advice about learning English faster.'},
+  ];
+  const TASK1_DATA = [
+    {title:'Weekly coffee consumption by country (average cups)', instruction:'Summarise the information by selecting and reporting the main features, and make comparisons where relevant.',
+      headers:['Country','2015','2025'], rows:[['Brazil','9','14'],['Ireland','12','15'],['Japan','6','10'],['USA','10','13']]},
+    {title:'Percentage of households with internet access', instruction:'Summarise the information by selecting and reporting the main features, and make comparisons where relevant.',
+      headers:['Region','2010','2025'], rows:[['Urban','58%','96%'],['Rural','21%','79%'],['National average','40%','88%']]},
+    {title:'Average commute time to work (minutes)', instruction:'Summarise the information by selecting and reporting the main features, and make comparisons where relevant.',
+      headers:['City','Car','Public transport','Cycling'], rows:[['Dublin','34','41','19'],['London','38','52','22'],['Amsterdam','21','28','14']]},
+    {title:'Monthly household spending by category (€)', instruction:'Summarise the information by selecting and reporting the main features, and make comparisons where relevant.',
+      headers:['Category','2015','2025'], rows:[['Housing','620','890'],['Food','340','480'],['Transport','180','260'],['Leisure','150','210']]},
+    {title:'University graduates by field of study (thousands)', instruction:'Summarise the information by selecting and reporting the main features, and make comparisons where relevant.',
+      headers:['Field','2010','2025'], rows:[['Engineering','45','78'],['Business','60','82'],['Arts','38','35'],['Computer Science','22','91']]},
+    {title:'Renewable energy share of total electricity production', instruction:'Summarise the information by selecting and reporting the main features, and make comparisons where relevant.',
+      headers:['Country','2010','2025'], rows:[['Ireland','14%','48%'],['Germany','17%','56%'],['Brazil','43%','61%']]},
+    {title:'Population aged 65 and over (% of total population)', instruction:'Summarise the information by selecting and reporting the main features, and make comparisons where relevant.',
+      headers:['Country','2000','2025'], rows:[['Japan','17%','30%'],['Ireland','11%','15%'],['Brazil','5%','11%']]},
+    {title:'Time spent on different leisure activities per week (hours)', instruction:'Summarise the information by selecting and reporting the main features, and make comparisons where relevant.',
+      headers:['Activity','18-30 years','50+ years'], rows:[['Watching TV','6','14'],['Social media','11','3'],['Exercise','4','5'],['Reading','2','6']]},
+  ];
+  const TASK2_PROMPTS = [
+    {type:'Opinion', prompt:'Some people believe that technology has made life more complicated, while others think it has made life easier. Discuss both views and give your own opinion.'},
+    {type:'Opinion', prompt:'Many people think that governments should invest more in public transport rather than roads. To what extent do you agree or disagree?'},
+    {type:'Advantages/Disadvantages', prompt:'More and more people are choosing to work from home. What are the advantages and disadvantages of this trend?'},
+    {type:'Problem/Solution', prompt:'Traffic congestion is a growing problem in many cities. What are the causes of this problem and what measures could be taken to solve it?'},
+    {type:'Discussion', prompt:'Some people think that children should start learning a foreign language as early as possible, while others believe it is better to wait until secondary school. Discuss both views and give your opinion.'},
+    {type:'Opinion', prompt:'Some people believe that university education should be free for everyone. To what extent do you agree or disagree?'},
+    {type:'Two-part', prompt:'In many countries, the amount of time people spend on social media is increasing. Why is this happening, and is it a positive or negative development?'},
+    {type:'Advantages/Disadvantages', prompt:'An increasing number of people are choosing to live and work in a different country from where they were born. What are the advantages and disadvantages of this?'},
+    {type:'Problem/Solution', prompt:'Many young people struggle to afford housing in big cities. What are the reasons for this and what can be done to address it?'},
+    {type:'Opinion', prompt:'Some people think that the best way to reduce crime is to give longer prison sentences. Others believe there are better alternative methods. Discuss both views and give your opinion.'},
+    {type:'Discussion', prompt:'Some people prefer to spend their lives doing the same things and avoiding change, while others think change is always a good thing. Discuss both views and give your own opinion.'},
+    {type:'Two-part', prompt:'In many countries, fewer people are choosing to cook meals at home. Why do you think this is happening, and what effects does it have on society?'},
+    {type:'Opinion', prompt:'Some people believe that unpaid community service should be a compulsory part of high school education. To what extent do you agree or disagree?'},
+    {type:'Advantages/Disadvantages', prompt:'Online shopping is becoming more popular than shopping in physical stores. What are the advantages and disadvantages of this trend?'},
+    {type:'Problem/Solution', prompt:'Many students find it difficult to balance study, work, and personal life. What are the causes of this and how can it be addressed?'},
+    {type:'Discussion', prompt:'Some people think that success in life comes from taking risks, while others believe careful planning is more important. Discuss both views and give your own opinion.'},
+    {type:'Opinion', prompt:'Some people think that artificial intelligence will eventually replace most human jobs. To what extent do you agree or disagree?'},
+    {type:'Two-part', prompt:'In many countries, people are living longer than in the past. What problems does this cause, and what solutions can you suggest?'},
+    {type:'Advantages/Disadvantages', prompt:'Many companies now allow employees to choose their own working hours. What are the advantages and disadvantages of this flexibility?'},
+    {type:'Problem/Solution', prompt:'Mental health problems among young people appear to be increasing. What do you think are the causes, and what can be done to help?'},
+    {type:'Discussion', prompt:'Some people believe that first impressions are usually accurate, while others think they can be misleading. Discuss both views and give your opinion.'},
+    {type:'Opinion', prompt:'Some people think that fast food should be taxed more heavily to discourage unhealthy eating. To what extent do you agree or disagree?'},
+    {type:'Two-part', prompt:'In many countries, small local shops are closing because of competition from large supermarkets. Why is this happening, and is it a positive or negative development?'},
+    {type:'Advantages/Disadvantages', prompt:'More people are choosing to study abroad rather than in their home country. What are the advantages and disadvantages of this?'},
+  ];
+
+  const DECKS = {
+    chunks: [
+      {front:'To be honest, ...', back:'Para ser sincero(a), ... — use ao dar uma opinião direta.'},
+      {front:'I guess you could say that...', back:'Eu diria que... — suaviza uma afirmação.'},
+      {front:'The thing is, ...', back:'O que acontece é que... — introduz uma explicação ou ressalva.'},
+      {front:"I haven't really thought about it, but...", back:'Eu não tinha pensado muito nisso, mas... — ganha tempo pra pensar.'},
+      {front:'It really depends on...', back:'Isso depende muito de... — ótimo pra Part 3, respostas mais elaboradas.'},
+      {front:'From my point of view, ...', back:'Do meu ponto de vista, ... — introduz opinião pessoal.'},
+      {front:"That's a good question, let me think...", back:'Essa é uma boa pergunta, deixa eu pensar... — filler natural pra ganhar tempo.'},
+      {front:"I'd say it's fair to say that...", back:'Eu diria que é justo dizer que... — soa maduro e natural.'},
+      {front:'What I mean is...', back:'O que eu quero dizer é... — usado pra se corrigir ou esclarecer.'},
+      {front:'As far as I know, ...', back:'Pelo que eu sei, ... — expressa certeza parcial.'},
+      {front:'I used to..., but now I...', back:'Eu costumava..., mas agora eu... — ótimo pra falar de mudanças/hábitos.'},
+      {front:'One thing that stands out is...', back:'Uma coisa que se destaca é... — bom pra Part 2, destacar um ponto.'},
+      {front:'Actually, now that you mention it...', back:'Na verdade, agora que você falou nisso...'},
+      {front:"I've never really considered that before.", back:'Eu nunca tinha pensado nisso antes.'},
+      {front:'To put it simply, ...', back:'Resumindo, ...'},
+      {front:'On the other hand, ...', back:'Por outro lado, ...'},
+      {front:'That said, ...', back:'Dito isso, ...'},
+      {front:'I tend to think that...', back:'Eu tendo a pensar que...'},
+      {front:"It's hard to say, but...", back:'É difícil dizer, mas...'},
+      {front:'Not necessarily, because...', back:'Não necessariamente, porque...'},
+      {front:'In my experience, ...', back:'Na minha experiência, ...'},
+      {front:"I can't really complain about...", back:'Eu não posso reclamar muito de...'},
+      {front:'It varies from person to person.', back:'Isso varia de pessoa para pessoa.'},
+      {front:"I wouldn't say that's always the case.", back:'Eu não diria que isso é sempre o caso.'},
+      {front:'There are pros and cons to...', back:'Há prós e contras em...'},
+      {front:'What stands out most to me is...', back:'O que mais se destaca pra mim é...'},
+      {front:'Looking back, I think...', back:'Olhando pra trás, eu acho que...'},
+      {front:"I'm not entirely sure, but I'd guess...", back:'Eu não tenho certeza absoluta, mas eu diria que...'},
+      {front:"It's one of those things where...", back:'É uma dessas coisas onde...'},
+      {front:'Compared to before, ...', back:'Comparado com antes, ...'},
+      {front:'The way I see it, ...', back:'Do jeito que eu vejo, ...'},
+      {front:"It's difficult to generalize, but...", back:'É difícil generalizar, mas...'},
+      {front:'I suppose it depends on the situation.', back:'Eu suponho que depende da situação.'},
+      {front:"That's something I've always wondered about.", back:'Isso é algo que eu sempre me perguntei.'},
+      {front:"Honestly, I haven't given it much thought.", back:'Sinceramente, eu não pensei muito nisso.'},
+      {front:"If I had to choose, I'd say...", back:'Se eu tivesse que escolher, eu diria...'},
+      {front:'It reminds me of a time when...', back:'Isso me lembra de uma vez que...'},
+      {front:'I guess it comes down to...', back:'Eu acho que se resume a...'},
+      {front:"That's a fair point, but...", back:'Esse é um ponto justo, mas...'},
+      {front:'At the end of the day, ...', back:'No final das contas, ...'},
+      {front:"I'm torn between two opinions on this.", back:'Eu estou dividido entre duas opiniões sobre isso.'},
+      {front:'Speaking from personal experience, ...', back:'Falando por experiência própria, ...'},
+      {front:"It's not something I do very often, but...", back:'Não é algo que eu faço com frequência, mas...'},
+      {front:'I can see both sides of the argument.', back:'Eu consigo ver os dois lados do argumento.'},
+      {front:"That's actually a really good example.", back:'Esse é na verdade um ótimo exemplo.'},
+      {front:'Let me put it this way...', back:'Deixa eu colocar desse jeito...'},
+      {front:'It really struck me how...', back:'Realmente me chamou atenção como...'},
+      {front:"I'd like to think that...", back:'Eu gostaria de pensar que...'},
+      {front:'As I mentioned earlier, ...', back:'Como eu mencionei antes, ...'},
+      {front:"That's a tricky one to answer.", back:'Essa é uma pergunta complicada de responder.'},
+    ],
+    temas: [
+      {front:'Describe a person who has had a big influence on your life.', back:'Pense em: quem é, como se conheceram, o que essa pessoa fez, por que influenciou você.'},
+      {front:'Describe a place you would love to visit in the future.', back:'Pense em: onde fica, por que quer ir, o que faria lá, o que espera sentir.'},
+      {front:'Describe a skill you learned that you are proud of.', back:'Pense em: o que é, como aprendeu, quanto tempo levou, por que tem orgulho.'},
+      {front:'Describe a time you helped someone.', back:'Pense em: quem, o que aconteceu, como ajudou, como se sentiu depois.'},
+      {front:'Describe a memorable trip you took.', back:'Pense em: para onde, com quem, o que fez, por que foi memorável.'},
+      {front:'Describe a change that improved your life.', back:'Pense em: o que mudou, quando, por que decidiu mudar, o resultado.'},
+      {front:'Describe a piece of technology you find useful.', back:'Pense em: o que é, como usa, há quanto tempo, por que é útil.'},
+      {front:'Describe a book or film that made an impression on you.', back:'Pense em: título, sobre o que é, quando viu/leu, por que impressionou.'},
+      {front:'Describe a decision that was difficult to make.', back:'Pense em: qual foi, quando, as opções, como decidiu, o resultado.'},
+      {front:'Describe a job you would like to have in the future.', back:'Pense em: qual é, por que quer, o que precisa fazer pra conseguir.'},
+      {front:'Describe a tradition from your country.', back:'Pense em: o que é, quando acontece, quem participa, o que significa.'},
+      {front:'Describe a time you felt proud of an achievement.', back:'Pense em: o que foi, quando, o esforço envolvido, como se sentiu.'},
+      {front:'Describe a hobby you enjoy in your free time.', back:'Pense em: o que é, desde quando faz, por que gosta, com que frequência pratica.'},
+      {front:'Describe a piece of good news you received.', back:'Pense em: qual foi a notícia, quando recebeu, como ficou sabendo, como se sentiu.'},
+      {front:'Describe a time you learned something new about yourself.', back:'Pense em: o que aconteceu, o que descobriu, como isso mudou você.'},
+      {front:'Describe a public place you like to visit.', back:'Pense em: onde fica, o que tem lá, por que gosta, com que frequência vai.'},
+      {front:'Describe a goal you are currently working towards.', back:'Pense em: qual é, por que é importante, o que está fazendo pra alcançar.'},
+      {front:'Describe a time you had to make a quick decision.', back:'Pense em: a situação, as opções, o que decidiu, o resultado.'},
+      {front:'Describe a website or app you use often.', back:'Pense em: qual é, pra que serve, desde quando usa, por que é útil.'},
+      {front:'Describe an interesting conversation you had with someone.', back:'Pense em: com quem, sobre o que, por que foi interessante.'},
+      {front:'Describe a time you had to work as part of a team.', back:'Pense em: o contexto, seu papel, os desafios, o resultado.'},
+      {front:'Describe a meal you really enjoyed.', back:'Pense em: o que era, onde comeu, com quem, por que gostou tanto.'},
+      {front:'Describe a person in your family you admire.', back:'Pense em: quem é, o que essa pessoa faz, por que você admira.'},
+      {front:'Describe a time you overcame a challenge.', back:'Pense em: qual era o desafio, como superou, o que aprendeu.'},
+      {front:'Describe a city you would like to live in.', back:'Pense em: qual cidade, por que, o que ela oferece, o que muda na sua vida.'},
+      {front:'Describe an object that is important to you.', back:'Pense em: o que é, de onde veio, por que tem valor pra você.'},
+      {front:'Describe a time you tried something for the first time.', back:'Pense em: o que foi, quando, como se sentiu, o resultado.'},
+      {front:'Describe a course or subject you would like to study.', back:'Pense em: qual é, por que interessa, como ajudaria você.'},
+      {front:'Describe a time you gave advice to someone.', back:'Pense em: quem, sobre o que, o que disse, o que aconteceu depois.'},
+      {front:'Describe a sport or physical activity you enjoy.', back:'Pense em: o que é, desde quando pratica, por que gosta.'},
+      {front:'Describe a piece of music that means something to you.', back:'Pense em: qual é, quando ouviu pela primeira vez, o que significa.'},
+      {front:'Describe a time you were really busy.', back:'Pense em: o período, o que estava fazendo, como lidou com isso.'},
+      {front:'Describe a neighbour or someone who lives near you.', back:'Pense em: quem é, como se conheceram, como é a relação.'},
+      {front:'Describe a time you saved money for something.', back:'Pense em: pra que estava juntando, quanto tempo levou, como se sentiu ao conseguir.'},
+      {front:'Describe an important letter or message you received.', back:'Pense em: de quem, sobre o que, por que foi importante.'},
+      {front:'Describe a time you visited a new place for the first time.', back:'Pense em: onde, com quem, o que achou do lugar.'},
+      {front:'Describe a habit you would like to change.', back:'Pense em: qual hábito, por que quer mudar, o que já tentou fazer.'},
+      {front:'Describe a teacher who influenced you.', back:'Pense em: quem foi, o que ensinou, por que marcou você.'},
+      {front:'Describe an event you celebrated recently.', back:'Pense em: qual evento, com quem, como celebrou.'},
+      {front:'Describe a piece of clothing you like to wear.', back:'Pense em: o que é, quando usa, por que gosta.'},
+      {front:'Describe a time you were treated well in a shop or restaurant.', back:'Pense em: onde, o que aconteceu, por que foi um bom atendimento.'},
+      {front:'Describe a time you disagreed with someone.', back:'Pense em: com quem, sobre o que, como resolveram.'},
+      {front:'Describe an ambition you have not yet achieved.', back:'Pense em: qual é, por que é importante, o que falta pra alcançar.'},
+      {front:'Describe a useful piece of advice someone gave you.', back:'Pense em: quem deu, qual foi o conselho, como ajudou você.'},
+      {front:'Describe a time you were interviewed or interviewed someone.', back:'Pense em: o contexto, como foi, o que aprendeu.'},
+      {front:'Describe an area of science or technology that interests you.', back:'Pense em: qual área, por que interessa, como afeta o dia a dia.'},
+      {front:'Describe a time you had to solve a problem quickly.', back:'Pense em: qual problema, o que fez, o resultado.'},
+      {front:'Describe a family celebration you remember well.', back:'Pense em: qual celebração, quem estava, por que foi marcante.'},
+      {front:'Describe an outdoor activity you enjoy.', back:'Pense em: qual atividade, onde faz, por que gosta.'},
+      {front:'Describe a change you would like to see in your city.', back:'Pense em: qual mudança, por que é necessária, como impactaria as pessoas.'},
+    ],
+    vocab: [
+      {front:'however', back:'no entanto — conecta uma ideia que contrasta com a anterior.'},
+      {front:'although', back:'embora — introduz uma ideia contrária dentro da mesma frase.'},
+      {front:'therefore', back:'portanto — indica uma consequência lógica.'},
+      {front:'moreover', back:'além disso — adiciona um argumento mais forte.'},
+      {front:'in addition', back:'além disso, adicionalmente.'},
+      {front:'for example', back:'por exemplo.'},
+      {front:'in other words', back:'em outras palavras — usado pra reformular o que disse.'},
+      {front:'as a result', back:'como resultado, consequentemente.'},
+      {front:'apart from that', back:'tirando isso, além disso.'},
+      {front:'in terms of', back:'em termos de.'},
+      {front:'when it comes to', back:'quando se trata de.'},
+      {front:'especially', back:'especialmente.'},
+      {front:'in fact', back:'na verdade.'},
+      {front:'overall', back:'no geral, de modo geral.'},
+      {front:'despite', back:'apesar de.'},
+      {front:'probably', back:'provavelmente.'},
+      {front:'definitely', back:'definitivamente, com certeza.'},
+      {front:'apparently', back:'aparentemente.'},
+      {front:'arguably', back:'pode-se dizer que, possivelmente.'},
+      {front:'personally', back:'pessoalmente.'},
+      {front:'generally speaking', back:'de modo geral.'},
+      {front:'to some extent', back:'até certo ponto.'},
+      {front:'roughly', back:'aproximadamente.'},
+      {front:'eventually', back:'eventualmente, no final das contas.'},
+      {front:'recently', back:'recentemente.'},
+      {front:'nowadays', back:'hoje em dia.'},
+      {front:'lately', back:'ultimamente.'},
+      {front:'meanwhile', back:'enquanto isso.'},
+      {front:'immediately', back:'imediatamente.'},
+      {front:'occasionally', back:'ocasionalmente.'},
+      {front:'rarely', back:'raramente.'},
+      {front:'frequently', back:'frequentemente.'},
+      {front:'gradually', back:'gradualmente, aos poucos.'},
+      {front:'beforehand', back:'com antecedência.'},
+      {front:'afterwards', back:'depois, posteriormente.'},
+      {front:'worthwhile', back:'que vale a pena.'},
+      {front:'reliable', back:'confiável.'},
+      {front:'convenient', back:'conveniente, prático.'},
+      {front:'exhausting', back:'exaustivo, cansativo.'},
+      {front:'rewarding', back:'gratificante.'},
+      {front:'challenging', back:'desafiador.'},
+      {front:'overwhelming', back:'avassalador, de dar um nó na cabeça.'},
+      {front:'flexible', back:'flexível.'},
+      {front:'affordable', back:'acessível (em relação a preço).'},
+      {front:'crowded', back:'lotado, cheio de gente.'},
+      {front:'spacious', back:'espaçoso.'},
+      {front:'essential', back:'essencial.'},
+      {front:'significant', back:'significativo.'},
+      {front:'noticeable', back:'perceptível, notável.'},
+      {front:'inevitable', back:'inevitável.'},
+      {front:'consistent', back:'consistente, constante.'},
+      {front:'take into account', back:'levar em consideração.'},
+      {front:'get used to', back:'se acostumar com.'},
+      {front:'look forward to', back:'estar animado(a)/ansioso(a) por algo que vai acontecer.'},
+      {front:'rely on', back:'depender de, contar com.'},
+      {front:'deal with', back:'lidar com.'},
+      {front:'figure out', back:'descobrir, entender.'},
+      {front:'come up with', back:'criar, imaginar (uma ideia).'},
+      {front:'put up with', back:'tolerar, aguentar.'},
+      {front:'end up', back:'acabar (fazendo/sendo algo).'},
+      {front:'give up', back:'desistir.'},
+      {front:'carry out', back:'realizar, executar.'},
+      {front:'point out', back:'apontar, destacar.'},
+      {front:'bring up', back:'trazer à tona (um assunto).'},
+      {front:'take on', back:'assumir (uma responsabilidade).'},
+      {front:'keep up with', back:'se manter atualizado com, acompanhar o ritmo de.'},
+      {front:'run into', back:'encontrar por acaso.'},
+      {front:'work out', back:'dar certo / se exercitar, dependendo do contexto.'},
+      {front:'turn out', back:'acabar sendo, revelar-se.'},
+      {front:'commute', back:'deslocamento diário até o trabalho.'},
+      {front:'workload', back:'carga de trabalho.'},
+      {front:'deadline', back:'prazo.'},
+      {front:'colleague', back:'colega de trabalho.'},
+      {front:'shift', back:'turno de trabalho.'},
+      {front:'routine', back:'rotina.'},
+      {front:'exhausted', back:'exausto.'},
+      {front:'motivated', back:'motivado.'},
+      {front:'stressed out', back:'estressado.'},
+      {front:'burnt out', back:'esgotado, no limite.'},
+      {front:'confident', back:'confiante.'},
+      {front:'anxious', back:'ansioso.'},
+      {front:'relieved', back:'aliviado.'},
+      {front:'frustrated', back:'frustrado.'},
+      {front:'curious', back:'curioso.'},
+      {front:'determined', back:'determinado.'},
+      {front:'independent', back:'independente.'},
+      {front:'sociable', back:'sociável.'},
+      {front:'outgoing', back:'extrovertido.'},
+      {front:'reserved', back:'reservado, tímido.'},
+      {front:'affordable housing', back:'moradia acessível.'},
+      {front:'cost of living', back:'custo de vida.'},
+      {front:'public transport', back:'transporte público.'},
+      {front:'environment', back:'meio ambiente.'},
+      {front:'pollution', back:'poluição.'},
+      {front:'sustainability', back:'sustentabilidade.'},
+      {front:'renewable energy', back:'energia renovável.'},
+      {front:'climate change', back:'mudança climática.'},
+      {front:'technology', back:'tecnologia.'},
+      {front:'artificial intelligence', back:'inteligência artificial.'},
+      {front:'social media', back:'redes sociais.'},
+      {front:'screen time', back:'tempo de tela.'},
+      {front:'remote work', back:'trabalho remoto.'},
+      {front:'work-life balance', back:'equilíbrio entre vida pessoal e trabalho.'},
+      {front:'education', back:'educação.'},
+      {front:'qualification', back:'qualificação, formação.'},
+      {front:'skillset', back:'conjunto de habilidades.'},
+      {front:'opportunity', back:'oportunidade.'},
+      {front:'achievement', back:'conquista.'},
+      {front:'challenge', back:'desafio.'},
+      {front:'improvement', back:'melhoria.'},
+      {front:'progress', back:'progresso.'},
+      {front:'experience', back:'experiência.'},
+      {front:'background', back:'histórico, formação pessoal.'},
+      {front:'upbringing', back:'criação (a forma como foi educado).'},
+      {front:'tradition', back:'tradição.'},
+      {front:'custom', back:'costume.'},
+      {front:'community', back:'comunidade.'},
+      {front:'neighbourhood', back:'bairro.'},
+      {front:'immigrant', back:'imigrante.'},
+      {front:'cultural difference', back:'diferença cultural.'},
+      {front:'adapt to', back:'se adaptar a.'},
+      {front:'homesick', back:'com saudade de casa.'},
+      {front:'fluent', back:'fluente.'},
+      {front:'accent', back:'sotaque.'},
+      {front:'pronunciation', back:'pronúncia.'},
+      {front:'vocabulary', back:'vocabulário.'},
+      {front:'confidence', back:'confiança.'},
+      {front:'nervous', back:'nervoso.'},
+      {front:'hesitate', back:'hesitar.'},
+      {front:'fluency', back:'fluência.'},
+      {front:'mistake', back:'erro.'},
+      {front:'improve', back:'melhorar.'},
+      {front:'practice', back:'praticar (verbo) / prática (substantivo).'},
+      {front:'consistent effort', back:'esforço consistente.'},
+      {front:'progress steadily', back:'progredir de forma constante.'},
+      {front:'plenty of', back:'bastante, muito de.'},
+      {front:'a couple of', back:'um par de, alguns.'},
+      {front:'a handful of', back:'um punhado de, poucos.'},
+      {front:'quite a lot', back:'bastante.'},
+      {front:'hardly any', back:'quase nenhum.'},
+      {front:'in the long run', back:'a longo prazo.'},
+      {front:'in the short term', back:'a curto prazo.'},
+      {front:'from now on', back:'de agora em diante.'},
+      {front:'sooner or later', back:'mais cedo ou mais tarde.'},
+      {front:'once in a while', back:'de vez em quando.'},
+      {front:'on a daily basis', back:'diariamente.'},
+      {front:'straight away', back:'imediatamente.'},
+      {front:'as soon as possible', back:'o mais rápido possível.'},
+      {front:'all things considered', back:'considerando tudo.'},
+    ]
+  };
+
+  function dailyIndex(date, offset, len){
+    const diff = Math.floor((date - new Date(2026,0,1))/86400000);
+    return ((diff+offset)%len + len)%len;
+  }
+
+  // ---- Pronúncia em voz alta (British English) via Web Speech API ----
+  let cachedVoice = null;
+  let voicesReady = false;
+  function pickBritishVoice(){
+    if(!('speechSynthesis' in window)) return null;
+    const voices = window.speechSynthesis.getVoices();
+    if(!voices || !voices.length) return null;
+    voicesReady = true;
+    // prioridade: vozes en-GB de melhor qualidade (nomes comuns no iOS/Safari)
+    const preferredNames = ['Daniel','Serena','Kate','Google UK English Male','Google UK English Female'];
+    let v = voices.find(v=>v.lang==='en-GB' && preferredNames.includes(v.name));
+    if(!v) v = voices.find(v=>v.lang==='en-GB');
+    if(!v) v = voices.find(v=>v.lang && v.lang.startsWith('en-GB'));
+    if(!v) v = voices.find(v=>v.lang && v.lang.startsWith('en'));
+    return v || null;
+  }
+  if('speechSynthesis' in window){
+    window.speechSynthesis.onvoiceschanged = ()=>{ cachedVoice = pickBritishVoice(); };
+    cachedVoice = pickBritishVoice();
+  }
+  function speak(text){
+    if(!('speechSynthesis' in window)){
+      alert('Seu navegador não suporta leitura em voz alta. Tente abrir essa página no Safari.');
+      return;
+    }
+    window.speechSynthesis.cancel();
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.lang = 'en-GB';
+    utter.rate = 0.85;
+    if(!cachedVoice) cachedVoice = pickBritishVoice();
+    if(cachedVoice) utter.voice = cachedVoice;
+    window.speechSynthesis.speak(utter);
+  }
+
+  // Abre a palavra/frase no YouGlish: vídeos reais de nativos pronunciando aquilo.
+  function youglishUrl(text){
+    const cleaned = text.replace(/\.\.\.$/,'').replace(/[",]/g,'').trim();
+    return 'https://youglish.com/pronounce/'+encodeURIComponent(cleaned.replace(/\s+/g,'+'))+'/english/uk';
+  }
+  function openYouglish(text){
+    window.open(youglishUrl(text), '_blank', 'noopener');
+  }
+
+  let state = { examDate:null, checklist:{}, myCards:[], doubts:[], srs:{}, writings:[] };
+  let fcState = { deck:'chunks', index:0, flipped:false };
+  let dailyFlip = { chunk:false, tema:false, vocab:false };
+  function showSaveToast(show){
+    const el = document.getElementById('saveToast');
+    if(!el) return;
+    el.classList.toggle('show', show);
+  }
+
+  // Versão offline/standalone: usa localStorage do navegador (funciona sem precisar
+  // do app ou site da Claude aberto). Fica salvo só neste aparelho e neste navegador.
+  async function loadState(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(raw){
+        const parsed = JSON.parse(raw);
+        state.examDate = parsed.examDate || null;
+        state.checklist = parsed.checklist || {};
+        state.myCards = parsed.myCards || [];
+        state.doubts = parsed.doubts || [];
+        state.srs = parsed.srs || {};
+        state.writings = parsed.writings || [];
+      }
+    }catch(e){
+      console.error('Não consegui ler o progresso salvo:', e);
+    }
+    if(!state.examDate) state.examDate = fmtDate(addDays(today,105));
+    render();
+  }
+
+  async function saveState(){
+    try{
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      showSaveToast(false);
+    }catch(e){
+      console.error('Falha ao salvar progresso:', e);
+      showSaveToast(true);
+    }
+  }
+
+    function requiredIds(dtype){ return TASKS[dtype].filter(t=>!t.optional).map(t=>t.id); }
+  function dayCompletion(dateStr, dtype){
+    const rec = state.checklist[dateStr] || {};
+    if(rec._manualComplete) return 1;
+    const req = requiredIds(dtype);
+    const done = req.filter(id=>rec[id]).length;
+    return req.length ? done/req.length : 0;
+  }
+  function weekIndexFor(date){
+    const diff = Math.floor((date-programStart)/86400000);
+    return Math.min(12, Math.max(1, Math.floor(diff/7)+1));
+  }
+
+  function render(){
+    document.getElementById('examDateInput').value = state.examDate;
+    const exam = new Date(state.examDate+'T00:00:00');
+    const diffDays = Math.round((exam-today)/86400000);
+    document.getElementById('countdownNum').innerHTML = (diffDays>=0?diffDays:0)+'<span>dias</span>';
+    renderRoute();
+    renderToday();
+    renderPhases();
+    renderDailyCards();
+    renderFlashcard();
+    renderProgress();
+    renderMyCards();
+    renderDoubts();
+    renderSrs();
+    renderWriting();
+    renderPuzzle();
+  }
+
+  function renderRoute(){
+    const currentWeek = weekIndexFor(today);
+    const wrap = document.getElementById('routeLine');
+    wrap.innerHTML='';
+    for(let w=1; w<=12; w++){
+      const stopStart = addDays(programStart, (w-1)*7);
+      let statusClass = w<currentWeek?'done':(w===currentWeek?'current':'');
+      const div = document.createElement('div');
+      div.className = 'stop '+statusClass;
+      div.innerHTML = `<div class="stop-dot">${w}</div><div class="stop-label">${stopStart.getDate()}/${stopStart.getMonth()+1}</div>`;
+      div.onclick = ()=>{ document.getElementById('roadmap-section').scrollIntoView({behavior:'smooth'}); };
+      wrap.appendChild(div);
+    }
+  }
+
+  function dayLabel(date){
+    if(sameDay(date,today)) return 'Hoje';
+    if(sameDay(date,addDays(today,-1))) return 'Ontem';
+    if(sameDay(date,addDays(today,1))) return 'Amanhã';
+    return PT_DAYS[date.getDay()];
+  }
+
+  function renderToday(){
+    const dtype = dayTypeFor(selectedDate);
+    const dateStr = fmtDate(selectedDate);
+    document.getElementById('todayDate').textContent = String(selectedDate.getDate()).padStart(2,'0')+'/'+String(selectedDate.getMonth()+1).padStart(2,'0')+'/'+selectedDate.getFullYear();
+    document.getElementById('dayName').textContent = dayLabel(selectedDate);
+    document.getElementById('dayType').textContent = dayTypeLabel(dtype);
+    document.getElementById('jumpToday').classList.toggle('show', !sameDay(selectedDate,today));
+
+    const week = weekIndexFor(selectedDate);
+    const episode = WEEKLY_EPISODES[week-1];
+    const chunk = DECKS.chunks[dailyIndex(selectedDate,0,DECKS.chunks.length)];
+    const tema = DECKS.temas[dailyIndex(selectedDate,7,DECKS.temas.length)];
+
+    const rec = state.checklist[dateStr] || {};
+    const list = document.getElementById('taskList');
+    list.innerHTML = '';
+    TASKS[dtype].forEach(t=>{
+      const checked = !!rec[t.id];
+      const row = document.createElement('div');
+      row.className = 'task'+(t.optional?' optional':'');
+      let detailHtml = `<div class="task-detail-inner">${t.tip}`;
+      if(t.useEpisode){
+        detailHtml += `<div class="featured"><span class="ft-tag">episódio da semana ${week}</span>${episode.title}</div>
+          <a class="res-link" href="${episode.url}" target="_blank" rel="noopener">${episode.fallback?'Ver episódio mais recente':'Abrir episódio (com transcrição)'}</a>`;
+      }
+      if(t.useTema) detailHtml += `<div class="featured"><span class="ft-tag">tema de hoje</span>"${tema.front}"</div>`;
+      if(t.useChunk) detailHtml += `<div class="featured"><span class="ft-tag">chunk de hoje</span>"${chunk.front}"<br><span style="font-weight:400;color:var(--muted);">${chunk.back}</span></div>`;
+      if(t.res) detailHtml += `<a class="res-link" href="${RES[t.res].url}" target="_blank" rel="noopener">${RES[t.res].label}</a>`;
+      detailHtml += `</div>`;
+      row.innerHTML = `
+        <div class="task-row">
+          <input type="checkbox" ${checked?'checked':''} data-id="${t.id}">
+          <div class="task-text">
+            <div class="task-title">${t.title}${t.optional?'<span class="opt-pill">opcional</span>':''}</div>
+            <div class="task-time mono">${t.time}</div>
+          </div>
+          <div class="task-chev">▾</div>
+        </div>
+        <div class="task-detail">${detailHtml}</div>`;
+      if(checked) row.classList.add('checked');
+
+      row.querySelector('input').addEventListener('click', (e)=>e.stopPropagation());
+      row.querySelector('input').addEventListener('change', async (e)=>{
+        if(!state.checklist[dateStr]) state.checklist[dateStr] = {};
+        state.checklist[dateStr][t.id] = e.target.checked;
+        await saveState();
+        renderToday();
+        renderProgress();
+      });
+      row.querySelector('.task-row').addEventListener('click', ()=>{ row.classList.toggle('open'); });
+      list.appendChild(row);
+    });
+    const pct = Math.round(dayCompletion(dateStr, dtype)*100);
+    document.getElementById('dayBar').style.width = pct+'%';
+    document.getElementById('dayPct').textContent = pct+'%';
+
+    const manualCheck = document.getElementById('manualCompleteCheck');
+    manualCheck.checked = !!rec._manualComplete;
+    manualCheck.onchange = async (e)=>{
+      if(!state.checklist[dateStr]) state.checklist[dateStr] = {};
+      state.checklist[dateStr]._manualComplete = e.target.checked;
+      await saveState();
+      renderToday();
+      renderProgress();
+    };
+  }
+
+  function renderPhases(){
+    const wrap = document.getElementById('phasesWrap');
+    wrap.innerHTML='';
+    PHASES.forEach((p,i)=>{
+      const div = document.createElement('div');
+      div.className = 'phase'+(i===0?' open':'');
+      div.innerHTML = `
+        <div class="phase-head">
+          <div><span class="phase-title">${p.title}</span></div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span class="phase-weeks">${p.weeks}</span>
+            <span class="phase-chev">▾</span>
+          </div>
+        </div>
+        <div class="phase-body"><div class="phase-body-inner">${p.text}</div></div>`;
+      div.querySelector('.phase-head').addEventListener('click', ()=>{ div.classList.toggle('open'); });
+      wrap.appendChild(div);
+    });
+  }
+
+  function renderDailyCards(){
+    const chunk = DECKS.chunks[dailyIndex(selectedDate,0,DECKS.chunks.length)];
+    const tema = DECKS.temas[dailyIndex(selectedDate,7,DECKS.temas.length)];
+    const vocab = DECKS.vocab[dailyIndex(selectedDate,0,DECKS.vocab.length)];
+    const chunkEl = document.getElementById('dailyChunk');
+    const temaEl = document.getElementById('dailyTema');
+    const vocabEl = document.getElementById('dailyVocab');
+    const hintHtml = (text)=>`<div class="dc-hint"><span>toque para virar</span>
+        <span class="dc-actions">
+          <button class="speak-btn" data-text="${text.replace(/"/g,'&quot;')}" aria-label="Ouvir">🔊</button>
+          <button class="speak-btn yg-btn" data-text="${text.replace(/"/g,'&quot;')}" aria-label="Ver no YouGlish">🎬</button>
+        </span></div>`;
+    chunkEl.className = 'daily-card'+(dailyFlip.chunk?' flipped':'');
+    chunkEl.innerHTML = `<div class="dc-tag">Chunk de hoje</div>
+      <div class="dc-front">${chunk.front}</div>
+      <div class="dc-back">${chunk.back}</div>
+      ${hintHtml(chunk.front)}`;
+    temaEl.className = 'daily-card'+(dailyFlip.tema?' flipped':'');
+    temaEl.innerHTML = `<div class="dc-tag">Tema Part 2 de hoje</div>
+      <div class="dc-front">${tema.front}</div>
+      <div class="dc-back">${tema.back}</div>
+      ${hintHtml(tema.front)}`;
+    vocabEl.className = 'daily-card'+(dailyFlip.vocab?' flipped':'');
+    vocabEl.innerHTML = `<div class="dc-tag">Palavra/expressão de hoje</div>
+      <div class="dc-front">${vocab.front}</div>
+      <div class="dc-back">${vocab.back}</div>
+      ${hintHtml(vocab.front)}`;
+    chunkEl.onclick = ()=>{ dailyFlip.chunk=!dailyFlip.chunk; renderDailyCards(); };
+    temaEl.onclick = ()=>{ dailyFlip.tema=!dailyFlip.tema; renderDailyCards(); };
+    vocabEl.onclick = ()=>{ dailyFlip.vocab=!dailyFlip.vocab; renderDailyCards(); };
+    [chunkEl,temaEl,vocabEl].forEach(el=>{
+      const sBtn = el.querySelector('.speak-btn:not(.yg-btn)');
+      const yBtn = el.querySelector('.yg-btn');
+      if(sBtn) sBtn.addEventListener('click', (e)=>{ e.stopPropagation(); speak(sBtn.dataset.text); });
+      if(yBtn) yBtn.addEventListener('click', (e)=>{ e.stopPropagation(); openYouglish(yBtn.dataset.text); });
+    });
+  }
+
+  function renderFlashcard(){
+    const deck = getDeck(fcState.deck);
+    fcState.index = Math.min(fcState.index, deck.length-1);
+    const card = deck[fcState.index];
+    document.getElementById('fcCount').textContent = (fcState.index+1)+'/'+deck.length;
+    const content = document.getElementById('fcContent');
+    content.innerHTML = !fcState.flipped
+      ? `<div class="fc-front">${card.front}</div>`
+      : `<div class="fc-back">${card.back||'—'}</div>`;
+  }
+
+  function renderProgress(){
+    const cells = [];
+    let totalDone = 0, streak = 0, streakBroken = false;
+    for(let i=13;i>=0;i--){
+      const d = addDays(today,-i);
+      const dtype = dayTypeFor(d);
+      const comp = dayCompletion(fmtDate(d), dtype);
+      const rec = state.checklist[fmtDate(d)]||{};
+      totalDone += Object.values(rec).filter(Boolean).length;
+      cells.push({label:PT_DAYS_SHORT[d.getDay()], comp});
+    }
+    for(let i=0;i<14;i++){
+      const d = addDays(today,-i);
+      const comp = dayCompletion(fmtDate(d), dayTypeFor(d));
+      if(comp>=1 && !streakBroken) streak++;
+      else if(i===0 && comp>0){ }
+      else streakBroken = true;
+    }
+    const heatRow = document.getElementById('heatRow');
+    heatRow.innerHTML='';
+    cells.forEach(c=>{
+      const div = document.createElement('div');
+      div.className = 'heat-cell'+(c.comp>=1?' full':c.comp>0?' partial':'');
+      div.textContent = c.label;
+      heatRow.appendChild(div);
+    });
+    document.getElementById('streakNum').textContent = streak;
+    document.getElementById('weekNum').textContent = weekIndexFor(today);
+    document.getElementById('totalDone').textContent = totalDone;
+  }
+
+  document.getElementById('examDateInput').addEventListener('change', async (e)=>{
+    state.examDate = e.target.value; await saveState(); render();
+  });
+  document.getElementById('dayPrev').addEventListener('click', ()=>{ selectedDate = addDays(selectedDate,-1); renderToday(); renderDailyCards(); });
+  document.getElementById('dayNext').addEventListener('click', ()=>{ selectedDate = addDays(selectedDate,1); renderToday(); renderDailyCards(); });
+  document.getElementById('jumpToday').addEventListener('click', ()=>{ selectedDate = dateOnly(new Date()); renderToday(); renderDailyCards(); });
+
+  document.getElementById('exploreBtn').addEventListener('click', ()=>{
+    document.getElementById('exploreWrap').classList.toggle('show');
+  });
+  document.querySelectorAll('.deck-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('.deck-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      fcState.deck = btn.dataset.deck; fcState.index=0; fcState.flipped=false;
+      renderFlashcard();
+    });
+  });
+  document.getElementById('fcSpeak').addEventListener('click', (e)=>{
+    e.stopPropagation();
+    const deck = getDeck(fcState.deck);
+    speak(deck[fcState.index].front);
+  });
+  document.getElementById('fcYouglish').addEventListener('click', (e)=>{
+    e.stopPropagation();
+    const deck = getDeck(fcState.deck);
+    openYouglish(deck[fcState.index].front);
+  });
+  document.getElementById('flashcard').addEventListener('click', ()=>{ fcState.flipped=!fcState.flipped; renderFlashcard(); });
+  document.getElementById('fcNext').addEventListener('click', (e)=>{ e.stopPropagation(); const d=getDeck(fcState.deck); fcState.index=(fcState.index+1)%d.length; fcState.flipped=false; renderFlashcard(); });
+  document.getElementById('fcPrev').addEventListener('click', (e)=>{ e.stopPropagation(); const d=getDeck(fcState.deck); fcState.index=(fcState.index-1+d.length)%d.length; fcState.flipped=false; renderFlashcard(); });
+
+  function getDeck(name){
+    return name === 'mycards' ? (state.myCards.length ? state.myCards : [{front:'Adicione seu primeiro card acima ☝️', back:'Vá até a seção "Meus cards" pra começar.'}]) : DECKS[name];
+  }
+
+  function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
+
+  function renderMyCards(){
+    document.getElementById('myCardsDeckBtn').textContent = `Meus cards (${state.myCards.length})`;
+    const list = document.getElementById('myCardsList');
+    list.innerHTML = '';
+    if(!state.myCards.length){
+      list.innerHTML = '<div class="empty-state">Nenhum card pessoal ainda. Adicione uma palavra ou frase acima.</div>';
+      return;
+    }
+    [...state.myCards].reverse().forEach(card=>{
+      const row = document.createElement('div');
+      row.className = 'list-item';
+      row.innerHTML = `
+        <div class="list-item-text">
+          <div class="list-item-front">${card.front}</div>
+          ${card.back ? `<div class="list-item-back">${card.back}</div>` : ''}
+        </div>
+        <div class="list-item-actions">
+          <button class="icon-btn" aria-label="Ouvir">🔊</button>
+          <button class="icon-btn" aria-label="Ver no YouGlish">🎬</button>
+          <button class="icon-btn danger" aria-label="Remover">🗑</button>
+        </div>`;
+      row.querySelectorAll('.icon-btn')[0].addEventListener('click', ()=>speak(card.front));
+      row.querySelectorAll('.icon-btn')[1].addEventListener('click', ()=>openYouglish(card.front));
+      row.querySelectorAll('.icon-btn')[2].addEventListener('click', async ()=>{
+        state.myCards = state.myCards.filter(c=>c.id!==card.id);
+        await saveState(); renderMyCards();
+        srsQueue = []; srsExtraMode=false; renderSrs();
+      });
+      list.appendChild(row);
+    });
+  }
+
+  document.getElementById('addMyCardBtn').addEventListener('click', async ()=>{
+    const frontEl = document.getElementById('myCardFront');
+    const backEl = document.getElementById('myCardBack');
+    const front = frontEl.value.trim();
+    const back = backEl.value.trim();
+    if(!front) { frontEl.focus(); return; }
+    state.myCards.push({id:uid(), front, back, createdAt:fmtDate(today)});
+    frontEl.value=''; backEl.value='';
+    await saveState();
+    renderMyCards();
+    srsQueue = []; srsExtraMode=false; renderSrs();
+  });
+
+  function renderDoubts(){
+    const list = document.getElementById('doubtsList');
+    list.innerHTML = '';
+    if(!state.doubts.length){
+      list.innerHTML = '<div class="empty-state">Nenhuma dúvida anotada ainda.</div>';
+      return;
+    }
+    [...state.doubts].reverse().forEach(d=>{
+      const row = document.createElement('div');
+      row.className = 'list-item'+(d.resolved?' resolved':'');
+      row.innerHTML = `
+        <div class="list-item-text">
+          <div class="list-item-front">${d.text}</div>
+          <div class="list-item-date">${d.createdAt}</div>
+        </div>
+        <div class="list-item-actions">
+          <button class="icon-btn" aria-label="Marcar como resolvida">${d.resolved?'↺':'✓'}</button>
+          <button class="icon-btn danger" aria-label="Remover">🗑</button>
+        </div>`;
+      row.querySelectorAll('.icon-btn')[0].addEventListener('click', async ()=>{
+        d.resolved = !d.resolved;
+        await saveState(); renderDoubts();
+      });
+      row.querySelectorAll('.icon-btn')[1].addEventListener('click', async ()=>{
+        state.doubts = state.doubts.filter(x=>x.id!==d.id);
+        await saveState(); renderDoubts();
+      });
+      list.appendChild(row);
+    });
+  }
+
+  document.getElementById('addDoubtBtn').addEventListener('click', async ()=>{
+    const el = document.getElementById('doubtInput');
+    const text = el.value.trim();
+    if(!text){ el.focus(); return; }
+    state.doubts.push({id:uid(), text, createdAt:fmtDate(today), resolved:false});
+    el.value='';
+    await saveState();
+    renderDoubts();
+  });
+
+  // ---- Simulado completo (Part 1, 2, 3) ----
+  function shuffle(arr){ const a=arr.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+
+  let mockState = null; // null = tela inicial
+
+  function buildMockSequence(){
+    const p1 = shuffle(PART1_QUESTIONS).slice(0,5);
+    const p2 = DECKS.temas[Math.floor(Math.random()*DECKS.temas.length)];
+    const p3 = shuffle(PART3_QUESTIONS).slice(0,5);
+    return { p1, p2, p3 };
+  }
+
+  function startMock(){
+    const seq = buildMockSequence();
+    mockState = {
+      seq,
+      phase: 'part1', // part1 -> part2prep -> part2speak -> part3 -> done
+      index: 0,
+      secondsLeft: 20,
+      timerId: null,
+    };
+    runMockTimer();
+    renderMock();
+  }
+
+  function mockPhaseDuration(phase){
+    if(phase==='part1') return 20;
+    if(phase==='part2prep') return 60;
+    if(phase==='part2speak') return 120;
+    if(phase==='part3') return 40;
+    return 0;
+  }
+
+  function runMockTimer(){
+    clearInterval(mockState.timerId);
+    mockState.timerId = setInterval(()=>{
+      mockState.secondsLeft--;
+      if(mockState.secondsLeft<=0){
+        advanceMock();
+      } else {
+        updateMockTimerDisplay();
+      }
+    },1000);
+  }
+
+  function updateMockTimerDisplay(){
+    const el = document.getElementById('mockTimer');
+    if(!el) return;
+    el.textContent = formatTimer(mockState.secondsLeft);
+    el.classList.toggle('warn', mockState.secondsLeft<=5);
+  }
+
+  function advanceMock(){
+    const {seq} = mockState;
+    if(mockState.phase==='part1'){
+      if(mockState.index < seq.p1.length-1){
+        mockState.index++;
+        mockState.secondsLeft = mockPhaseDuration('part1');
+      } else {
+        mockState.phase = 'part2prep';
+        mockState.index = 0;
+        mockState.secondsLeft = mockPhaseDuration('part2prep');
+      }
+    } else if(mockState.phase==='part2prep'){
+      mockState.phase = 'part2speak';
+      mockState.secondsLeft = mockPhaseDuration('part2speak');
+    } else if(mockState.phase==='part2speak'){
+      mockState.phase = 'part3';
+      mockState.index = 0;
+      mockState.secondsLeft = mockPhaseDuration('part3');
+    } else if(mockState.phase==='part3'){
+      if(mockState.index < seq.p3.length-1){
+        mockState.index++;
+        mockState.secondsLeft = mockPhaseDuration('part3');
+      } else {
+        clearInterval(mockState.timerId);
+        mockState.phase = 'done';
+      }
+    }
+    if(mockState.phase!=='done') runMockTimer();
+    else clearInterval(mockState.timerId);
+    renderMock();
+  }
+
+  function skipMock(){ mockState.secondsLeft = 0; advanceMock(); }
+
+  function stopMock(){
+    if(mockState) clearInterval(mockState.timerId);
+    mockState = null;
+    renderMock();
+  }
+
+  function phaseLabel(phase){
+    if(phase==='part1') return 'Part 1 — perguntas pessoais';
+    if(phase==='part2prep') return 'Part 2 — 1 minuto de preparo';
+    if(phase==='part2speak') return 'Part 2 — fale por 2 minutos';
+    if(phase==='part3') return 'Part 3 — discussão';
+    return '';
+  }
+
+  function renderMock(){
+    const wrap = document.getElementById('mockWrap');
+    if(!mockState){
+      wrap.innerHTML = `
+        <div class="mock-intro">
+          <div class="mi-steps">
+            <div class="mi-step"><b>5</b>Part 1<br>~20s cada</div>
+            <div class="mi-step"><b>1</b>Part 2<br>1min prep + 2min fala</div>
+            <div class="mi-step"><b>5</b>Part 3<br>~40s cada</div>
+          </div>
+          <button class="mock-start-btn" id="mockStartBtn">▶ Começar simulado</button>
+        </div>`;
+      document.getElementById('mockStartBtn').addEventListener('click', startMock);
+      return;
+    }
+    if(mockState.phase==='done'){
+      wrap.innerHTML = `
+        <div class="mock-done">
+          <div class="big-check">🏁</div>
+          <p style="color:var(--muted);font-size:13px;margin:8px 0 14px;">Simulado completo! Se gravou, é uma boa hora pra reescutar e anotar pontos fracos em "Minhas dúvidas".</p>
+          <button class="add-btn" id="mockAgainBtn">Fazer outro simulado</button>
+        </div>`;
+      document.getElementById('mockAgainBtn').addEventListener('click', startMock);
+      return;
+    }
+    const {seq, phase, index} = mockState;
+    let question = '';
+    let sub = '';
+    if(phase==='part1'){ question = seq.p1[index]; sub = `Pergunta ${index+1} de ${seq.p1.length}`; }
+    else if(phase==='part2prep'){ question = seq.p2.front; sub = 'Anote ideias — não precisa falar ainda'; }
+    else if(phase==='part2speak'){ question = seq.p2.front; sub = 'Fale agora, sem parar'; }
+    else if(phase==='part3'){ question = seq.p3[index]; sub = `Pergunta ${index+1} de ${seq.p3.length}`; }
+
+    const totalDots = phase==='part1' ? seq.p1.length : phase==='part3' ? seq.p3.length : 1;
+    const activeDot = phase==='part1' || phase==='part3' ? index : 0;
+    let dotsHtml = '';
+    for(let i=0;i<totalDots;i++){
+      dotsHtml += `<div class="mock-dot ${i<activeDot?'done':(i===activeDot?'active':'')}"></div>`;
+    }
+
+    wrap.innerHTML = `
+      <div class="mock-run">
+        <div class="mock-phase-tag">${phaseLabel(phase)}</div>
+        <div class="mock-phase-sub">${sub}</div>
+        <div class="mock-q">${question}</div>
+        <div class="mock-timer" id="mockTimer">${formatTimer(mockState.secondsLeft)}</div>
+        <div class="mock-controls">
+          <button class="timer-btn primary" id="mockNextBtn">Próxima</button>
+          <button class="timer-btn secondary" id="mockStopBtn">Encerrar</button>
+        </div>
+        <div class="mock-progress-dots">${dotsHtml}</div>
+      </div>`;
+    document.getElementById('mockNextBtn').addEventListener('click', skipMock);
+    document.getElementById('mockStopBtn').addEventListener('click', stopMock);
+  }
+
+  renderMock();
+
+  // ---- Writing (Task 1 / Task 2) ----
+  let writingState = { task:1, current:null, seconds:0, timerId:null, running:false, checklist:{} };
+
+  function pickWritingPrompt(task){
+    if(task===1){
+      const useData = Math.random() < 0.5;
+      if(useData) return {kind:'data', data: TASK1_DATA[Math.floor(Math.random()*TASK1_DATA.length)]};
+      return {kind:'letter', data: TASK1_LETTERS[Math.floor(Math.random()*TASK1_LETTERS.length)]};
+    }
+    return {kind:'essay', data: TASK2_PROMPTS[Math.floor(Math.random()*TASK2_PROMPTS.length)]};
+  }
+
+  function wrDuration(task){ return task===1 ? 20*60 : 40*60; }
+  function wrMinWords(task){ return task===1 ? 150 : 250; }
+
+  function shuffleWritingPrompt(){
+    writingState.current = pickWritingPrompt(writingState.task);
+    writingState.seconds = wrDuration(writingState.task);
+    writingState.running = false;
+    writingState.checklist = {};
+    clearInterval(writingState.timerId);
+    renderWriting();
+  }
+
+  function wrText(){
+    const el = document.getElementById('wrTextarea');
+    return el ? el.value : '';
+  }
+  function wrWordCount(text){
+    const t = text.trim();
+    return t ? t.split(/\s+/).length : 0;
+  }
+
+  function renderWriting(){
+    const wrap = document.getElementById('writingWrap');
+    if(!writingState.current){
+      wrap.innerHTML = `<div class="wr-prompt-card" style="text-align:center;">
+        <p style="color:var(--muted);font-size:13px;margin-bottom:6px;">Nenhum tema sorteado ainda.</p>
+        <button class="wr-shuffle-btn" id="wrShuffleBtn">🎲 Sortear tema</button>
+      </div>`;
+      document.getElementById('wrShuffleBtn').addEventListener('click', shuffleWritingPrompt);
+      renderSavedWritings();
+      return;
+    }
+    const {kind, data} = writingState.current;
+    let promptHtml = '';
+    if(kind==='letter'){
+      promptHtml = `<span class="wr-prompt-type">Task 1 · Carta (${data.register})</span><div class="wr-prompt-text">${data.prompt}</div>`;
+    } else if(kind==='data'){
+      let table = `<table class="wr-data-table"><thead><tr>${data.headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>`;
+      data.rows.forEach(r=>{ table += `<tr>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`; });
+      table += `</tbody></table>`;
+      promptHtml = `<span class="wr-prompt-type">Task 1 · Dados</span><div class="wr-prompt-text">${data.title}</div>${table}<div class="wr-prompt-text" style="font-weight:400;font-size:13px;margin-top:8px;">${data.instruction}</div>`;
+    } else {
+      promptHtml = `<span class="wr-prompt-type">Task 2 · ${data.type}</span><div class="wr-prompt-text">${data.prompt}</div>`;
+    }
+    const min = wrMinWords(writingState.task);
+    const wc = wrWordCount(wrText());
+    wrap.innerHTML = `
+      <div class="wr-prompt-card">
+        ${promptHtml}
+        <button class="wr-shuffle-btn" id="wrShuffleBtn">🎲 Sortear outro tema</button>
+        <div class="wr-timer-row">
+          <button class="timer-btn secondary" id="wrTimerToggle">${writingState.running?'Pausar':'Começar'}</button>
+          <div class="wr-timer ${writingState.seconds<=120?'warn':''}" id="wrTimerDisplay">${formatTimer(writingState.seconds)}</div>
+          <button class="timer-btn secondary" id="wrTimerReset">Reiniciar</button>
+        </div>
+        <textarea class="wr-textarea" id="wrTextarea" placeholder="Escreva sua resposta aqui...">${writingState.savedDraft||''}</textarea>
+        <div class="wr-meta-row">
+          <span class="wr-word-count ${wc>=min?'ok':''}" id="wrWordCount">${wc} palavras (mínimo ${min})</span>
+          <div class="wr-actions">
+            <button class="add-btn" id="wrSaveBtn">Salvar este texto</button>
+          </div>
+        </div>
+        <div class="wr-checklist">
+          <div style="font-size:11.5px;font-weight:700;color:var(--navy);margin-bottom:4px;">Autoavaliação rápida</div>
+          ${['Respondi exatamente o que foi pedido','Organizei em parágrafos com introdução e conclusão','Usei conectores variados (however, moreover, in addition...)','Revisei erros óbvios de gramática/tempo verbal'].map((label,i)=>`
+            <label class="wr-checklist-item">
+              <input type="checkbox" data-idx="${i}" ${writingState.checklist[i]?'checked':''}>
+              <span>${label}</span>
+            </label>`).join('')}
+        </div>
+      </div>`;
+    document.getElementById('wrShuffleBtn').addEventListener('click', shuffleWritingPrompt);
+    document.getElementById('wrTimerReset').addEventListener('click', ()=>{
+      clearInterval(writingState.timerId);
+      writingState.running = false;
+      writingState.seconds = wrDuration(writingState.task);
+      renderWriting();
+    });
+    document.getElementById('wrTimerToggle').addEventListener('click', ()=>{
+      writingState.running = !writingState.running;
+      if(writingState.running){
+        writingState.timerId = setInterval(()=>{
+          writingState.seconds--;
+          const el = document.getElementById('wrTimerDisplay');
+          if(el){ el.textContent = formatTimer(Math.max(0,writingState.seconds)); el.classList.toggle('warn', writingState.seconds<=120); }
+          if(writingState.seconds<=0){ clearInterval(writingState.timerId); writingState.running=false; if(navigator.vibrate) navigator.vibrate([200,100,200]); renderWriting(); }
+        },1000);
+      } else clearInterval(writingState.timerId);
+      const btn = document.getElementById('wrTimerToggle');
+      if(btn) btn.textContent = writingState.running?'Pausar':'Começar';
+    });
+    document.getElementById('wrTextarea').addEventListener('input', (e)=>{
+      writingState.savedDraft = e.target.value;
+      const wc2 = wrWordCount(e.target.value);
+      const el = document.getElementById('wrWordCount');
+      el.textContent = wc2+' palavras (mínimo '+min+')';
+      el.classList.toggle('ok', wc2>=min);
+    });
+    wrap.querySelectorAll('.wr-checklist-item input').forEach(cb=>{
+      cb.addEventListener('change', (e)=>{ writingState.checklist[e.target.dataset.idx] = e.target.checked; });
+    });
+    document.getElementById('wrSaveBtn').addEventListener('click', async ()=>{
+      const text = wrText();
+      if(!text.trim()){ return; }
+      if(!state.writings) state.writings = [];
+      state.writings.push({
+        id: uid(), task: writingState.task, kind, promptSummary: kind==='data'?data.title:data.prompt,
+        text, wordCount: wrWordCount(text), date: fmtDate(today)
+      });
+      await saveState();
+      writingState.savedDraft = '';
+      writingState.current = null;
+      clearInterval(writingState.timerId);
+      renderWriting();
+    });
+    renderSavedWritings();
+  }
+
+  function renderSavedWritings(){
+    const wrap = document.getElementById('writingWrap');
+    if(!state.writings || !state.writings.length) return;
+    let html = `<div class="wr-saved-list"><div style="font-size:11.5px;font-weight:700;color:var(--navy);margin-bottom:8px;">Textos salvos (${state.writings.length})</div>`;
+    [...state.writings].reverse().forEach(w=>{
+      html += `<div class="list-item" style="margin-bottom:8px;">
+        <div class="list-item-text">
+          <div class="list-item-front">Task ${w.task} · ${w.wordCount} palavras · ${w.date}</div>
+          <div class="list-item-back">${w.promptSummary}</div>
+        </div>
+        <div class="list-item-actions">
+          <button class="icon-btn danger" data-id="${w.id}" aria-label="Remover">🗑</button>
+        </div>
+      </div>`;
+    });
+    html += `</div>`;
+    wrap.insertAdjacentHTML('beforeend', html);
+    wrap.querySelectorAll('.wr-saved-list .icon-btn.danger').forEach(btn=>{
+      btn.addEventListener('click', async ()=>{
+        state.writings = state.writings.filter(w=>w.id!==btn.dataset.id);
+        await saveState();
+        renderWriting();
+      });
+    });
+  }
+
+  document.querySelectorAll('.wr-chip').forEach(chip=>{
+    chip.addEventListener('click', ()=>{
+      document.querySelectorAll('.wr-chip').forEach(c=>c.classList.remove('active'));
+      chip.classList.add('active');
+      writingState.task = parseInt(chip.dataset.task,10);
+      writingState.current = null;
+      clearInterval(writingState.timerId);
+      renderWriting();
+    });
+  });
+  renderWriting();
+
+  // ---- Puzzles (jogo da memória e caça-palavras) ----
+  function puzzleWordPool(){
+    const pool = DECKS.vocab.filter(v=>/^[a-zA-Z\s'-]+$/.test(v.front) && v.front.length<=12);
+    return pool.concat(state.myCards.filter(c=>/^[a-zA-Z\s'-]+$/.test(c.front) && c.front.length<=12));
+  }
+
+  let puzzleGame = 'memory';
+  let memoryState = null;
+  let wsState = null;
+
+  function newMemoryGame(){
+    const pool = shuffle(puzzleWordPool()).slice(0,6);
+    let cards = [];
+    pool.forEach((w,i)=>{
+      cards.push({key:i, text:w.front, type:'en'});
+      cards.push({key:i, text:w.back.replace(/\.$/,''), type:'pt'});
+    });
+    cards = shuffle(cards).map((c,idx)=>({...c, id:idx, revealed:false, matched:false}));
+    memoryState = { cards, firstPick:null, lock:false, moves:0, matches:0, total:pool.length };
+    renderPuzzle();
+  }
+
+  function renderMemory(){
+    const wrap = document.getElementById('puzzleWrap');
+    if(!memoryState) newMemoryGame();
+    wrap.innerHTML = `
+      <div class="puzzle-meta"><span>${memoryState.matches}/${memoryState.total} pares encontrados</span><span>${memoryState.moves} tentativas</span></div>
+      <div class="memory-grid" id="memoryGrid"></div>
+      <div class="explore-toggle"><button id="newMemoryBtn">Novo jogo</button></div>`;
+    const grid = document.getElementById('memoryGrid');
+    memoryState.cards.forEach(c=>{
+      const div = document.createElement('div');
+      div.className = 'memory-card'+(c.matched?' matched':(c.revealed?' revealed':' hidden-face'));
+      div.textContent = (c.matched||c.revealed) ? c.text : '?';
+      div.addEventListener('click', ()=>onMemoryCardClick(c.id));
+      grid.appendChild(div);
+    });
+    document.getElementById('newMemoryBtn').addEventListener('click', newMemoryGame);
+  }
+
+  function onMemoryCardClick(id){
+    if(memoryState.lock) return;
+    const card = memoryState.cards.find(c=>c.id===id);
+    if(!card || card.revealed || card.matched) return;
+    card.revealed = true;
+    if(memoryState.firstPick===null){
+      memoryState.firstPick = id;
+      renderMemory();
+      return;
+    }
+    memoryState.moves++;
+    const first = memoryState.cards.find(c=>c.id===memoryState.firstPick);
+    if(first.key===card.key){
+      first.matched = true; card.matched = true;
+      memoryState.matches++;
+      memoryState.firstPick = null;
+      renderMemory();
+    } else {
+      memoryState.lock = true;
+      renderMemory();
+      setTimeout(()=>{
+        first.revealed = false; card.revealed = false;
+        memoryState.firstPick = null;
+        memoryState.lock = false;
+        renderMemory();
+      }, 800);
+    }
+  }
+
+  function newWordSearch(){
+    const SIZE = 10;
+    const words = shuffle(puzzleWordPool()).map(w=>w.front.toUpperCase().replace(/[^A-Z]/g,'')).filter(w=>w.length>=3 && w.length<=SIZE);
+    const chosen = [];
+    const seen = new Set();
+    for(const w of words){ if(!seen.has(w)){ seen.add(w); chosen.push(w); } if(chosen.length>=6) break; }
+    const grid = Array.from({length:SIZE},()=>Array(SIZE).fill(null));
+    const dirs = [[1,0],[0,1],[1,1]];
+    const placed = [];
+    chosen.forEach(word=>{
+      let ok=false;
+      for(let attempt=0; attempt<60 && !ok; attempt++){
+        const [dx,dy] = dirs[Math.floor(Math.random()*dirs.length)];
+        const maxRow = dy ? SIZE-word.length : SIZE-1;
+        const maxCol = dx ? SIZE-word.length : SIZE-1;
+        const row = Math.floor(Math.random()*(maxRow+1));
+        const col = Math.floor(Math.random()*(maxCol+1));
+        let fits = true;
+        for(let i=0;i<word.length;i++){
+          const r=row+dy*i, c=col+dx*i;
+          if(grid[r][c] && grid[r][c]!==word[i]){ fits=false; break; }
+        }
+        if(fits){
+          for(let i=0;i<word.length;i++){ grid[row+dy*i][col+dx*i]=word[i]; }
+          placed.push({word, row, col, dx, dy, found:false});
+          ok=true;
+        }
+      }
+    });
+    for(let r=0;r<SIZE;r++) for(let c=0;c<SIZE;c++) if(!grid[r][c]) grid[r][c]=String.fromCharCode(65+Math.floor(Math.random()*26));
+    wsState = { size:SIZE, grid, placed, selection:[] };
+    renderPuzzle();
+  }
+
+  function cellKey(r,c){ return r+'-'+c; }
+
+  function renderWordSearch(){
+    const wrap = document.getElementById('puzzleWrap');
+    if(!wsState) newWordSearch();
+    const {size, grid, placed} = wsState;
+    let html = `<div class="ws-grid" style="grid-template-columns:repeat(${size},1fr);">`;
+    for(let r=0;r<size;r++) for(let c=0;c<size;c++){
+      const isFound = placed.some(p=>p.found && inWord(p,r,c));
+      const isSelected = wsState.selection.some(s=>s.r===r&&s.c===c);
+      html += `<div class="ws-cell ${isFound?'found':(isSelected?'selected':'')}" data-r="${r}" data-c="${c}">${grid[r][c]}</div>`;
+    }
+    html += `</div><div class="ws-words-row">`;
+    placed.forEach(p=>{ html += `<span class="ws-word-chip ${p.found?'found':''}">${p.word}</span>`; });
+    html += `</div><div class="explore-toggle"><button id="newWsBtn">Novo jogo</button></div>`;
+    wrap.innerHTML = html;
+    wrap.querySelectorAll('.ws-cell').forEach(cell=>{
+      cell.addEventListener('click', ()=>onWsCellClick(parseInt(cell.dataset.r,10), parseInt(cell.dataset.c,10)));
+    });
+    document.getElementById('newWsBtn').addEventListener('click', newWordSearch);
+  }
+
+  function inWord(p, r, c){
+    for(let i=0;i<p.word.length;i++){ if(p.row+p.dy*i===r && p.col+p.dx*i===c) return true; }
+    return false;
+  }
+
+  function onWsCellClick(r,c){
+    if(wsState.selection.length===0){ wsState.selection=[{r,c}]; renderWordSearch(); return; }
+    if(wsState.selection.length===1){
+      wsState.selection.push({r,c});
+      const [a,b] = wsState.selection;
+      const dr = Math.sign(b.r-a.r), dc = Math.sign(b.c-a.c);
+      const len = Math.max(Math.abs(b.r-a.r),Math.abs(b.c-a.c))+1;
+      let letters = '';
+      const cells = [];
+      for(let i=0;i<len;i++){ const rr=a.r+dr*i, cc=a.c+dc*i; letters += wsState.grid[rr][cc]; cells.push({r:rr,c:cc}); }
+      const match = wsState.placed.find(p=>!p.found && (p.word===letters || p.word===letters.split('').reverse().join('')));
+      if(match){ match.found = true; }
+      wsState.selection = [];
+      renderWordSearch();
+    }
+  }
+
+  function renderPuzzle(){
+    if(puzzleGame==='memory') renderMemory(); else renderWordSearch();
+  }
+
+  document.querySelectorAll('.pz-chip').forEach(chip=>{
+    chip.addEventListener('click', ()=>{
+      document.querySelectorAll('.pz-chip').forEach(c=>c.classList.remove('active'));
+      chip.classList.add('active');
+      puzzleGame = chip.dataset.game;
+      renderPuzzle();
+    });
+  });
+  renderPuzzle();
+
+  // ---- Fale agora: tema aleatório + cronômetro ----
+  let timerSecsTotal = 120;
+  let timerSecsLeft = 120;
+  let timerInterval = null;
+  let timerRunning = false;
+
+  function formatTimer(s){
+    const m = Math.floor(s/60), sec = s%60;
+    return String(m).padStart(2,'0')+':'+String(sec).padStart(2,'0');
+  }
+  function updateTimerDisplay(){
+    const el = document.getElementById('timerDisplay');
+    el.textContent = formatTimer(timerSecsLeft);
+    el.classList.toggle('done', timerSecsLeft===0);
+  }
+  document.getElementById('shuffleBtn').addEventListener('click', ()=>{
+    const topic = DECKS.temas[Math.floor(Math.random()*DECKS.temas.length)];
+    const el = document.getElementById('practiceTopic');
+    el.textContent = topic.front;
+    el.classList.remove('placeholder');
+  });
+  document.querySelectorAll('#durationChips .chip').forEach(chip=>{
+    chip.addEventListener('click', ()=>{
+      document.querySelectorAll('#durationChips .chip').forEach(c=>c.classList.remove('active'));
+      chip.classList.add('active');
+      timerSecsTotal = parseInt(chip.dataset.secs,10);
+      timerSecsLeft = timerSecsTotal;
+      clearInterval(timerInterval); timerRunning=false;
+      document.getElementById('timerStart').textContent = 'Começar';
+      updateTimerDisplay();
+    });
+  });
+  document.getElementById('timerStart').addEventListener('click', (e)=>{
+    if(timerRunning){
+      clearInterval(timerInterval); timerRunning=false;
+      e.target.textContent = 'Continuar';
+      return;
+    }
+    if(timerSecsLeft===0) timerSecsLeft = timerSecsTotal;
+    timerRunning = true;
+    e.target.textContent = 'Pausar';
+    timerInterval = setInterval(()=>{
+      timerSecsLeft--;
+      updateTimerDisplay();
+      if(timerSecsLeft<=0){
+        clearInterval(timerInterval); timerRunning=false;
+        document.getElementById('timerStart').textContent = 'Começar';
+        if(navigator.vibrate) navigator.vibrate([200,100,200]);
+      }
+    },1000);
+  });
+  document.getElementById('timerReset').addEventListener('click', ()=>{
+    clearInterval(timerInterval); timerRunning=false;
+    timerSecsLeft = timerSecsTotal;
+    document.getElementById('timerStart').textContent = 'Começar';
+    updateTimerDisplay();
+  });
+  updateTimerDisplay();
+
+  // ---- Revisão estilo Anki (SRS) ----
+  // Junta: chunks (id 'chunk-i'), palavras/expressões já vistas como "de hoje" desde o início
+  // do programa (id 'vocab-i', crescendo um item novo por dia) e todos os Meus cards.
+  function buildSrsPool(){
+    const pool = [];
+    DECKS.chunks.forEach((c,i)=>pool.push({id:'chunk-'+i, front:c.front, back:c.back, tag:'chunk'}));
+    const seenVocab = new Set();
+    let d = new Date(programStart);
+    let guard = 0;
+    while(d<=today && guard<400){
+      const idx = dailyIndex(d,0,DECKS.vocab.length);
+      seenVocab.add(idx);
+      d = addDays(d,1);
+      guard++;
+    }
+    seenVocab.forEach(idx=>{
+      const v = DECKS.vocab[idx];
+      pool.push({id:'vocab-'+idx, front:v.front, back:v.back, tag:'vocabulário'});
+    });
+    state.myCards.forEach(c=>pool.push({id:c.id, front:c.front, back:c.back||'—', tag:'meu card'}));
+    return pool;
+  }
+
+  function isDue(cardId){
+    const s = state.srs[cardId];
+    if(!s) return true; // card novo, nunca revisado
+    return s.due <= fmtDate(today);
+  }
+
+  function scheduleCard(cardId, rating){
+    const prev = state.srs[cardId] || {reps:0, interval:0, ease:2.5, due:fmtDate(today)};
+    let {reps, interval, ease} = prev;
+    if(rating==='again'){
+      reps = 0; interval = 0; ease = Math.max(1.3, ease-0.2);
+    } else if(rating==='hard'){
+      ease = Math.max(1.3, ease-0.15);
+      interval = reps===0 ? 1 : Math.max(1, Math.round(interval*1.2));
+      reps += 1;
+    } else if(rating==='good'){
+      interval = reps===0 ? 1 : (reps===1 ? 3 : Math.round(interval*ease));
+      reps += 1;
+    } else if(rating==='easy'){
+      ease = ease+0.15;
+      interval = reps===0 ? 3 : (reps===1 ? 5 : Math.round(interval*ease*1.3));
+      reps += 1;
+    }
+    state.srs[cardId] = {reps, interval, ease, due: fmtDate(addDays(today, interval))};
+  }
+
+  let srsQueue = [];
+  let srsShowingBack = false;
+  let srsExtraMode = false;
+  let srsSessionTotal = 0;
+
+  function refreshSrsQueue(force){
+    const pool = buildSrsPool();
+    srsQueue = force ? pool.slice() : pool.filter(c=>isDue(c.id));
+    srsSessionTotal = srsQueue.length;
+  }
+
+  function renderSrs(){
+    const pool = buildSrsPool();
+    const dueCount = pool.filter(c=>isDue(c.id)).length;
+    document.getElementById('srsDueTag').textContent = dueCount+' pra hoje';
+
+    if(srsQueue.length===0 && !srsExtraMode){
+      refreshSrsQueue(false);
+    }
+
+    const wrap = document.getElementById('srsWrap');
+    if(srsQueue.length===0){
+      wrap.innerHTML = `
+        <div class="srs-empty">
+          <div class="big-check">🎉</div>
+          <p>Nada pendente pra revisar agora. Volte mais tarde ou revise tudo de novo como extra.</p>
+          <button class="add-btn" id="srsExtraBtn">Revisar tudo mesmo assim (${pool.length})</button>
+        </div>`;
+      const btn = document.getElementById('srsExtraBtn');
+      if(btn) btn.addEventListener('click', ()=>{
+        srsExtraMode = true;
+        refreshSrsQueue(true);
+        srsShowingBack = false;
+        renderSrs();
+      });
+      return;
+    }
+
+    const card = srsQueue[0];
+    const remaining = srsQueue.length;
+    let html = `<div class="srs-card">
+      <span class="srs-source-tag">${card.tag}</span>
+      <span style="position:absolute;top:10px;right:14px;display:flex;gap:6px;">
+        <button class="speak-btn light" id="srsSpeak" aria-label="Ouvir">🔊</button>
+        <button class="speak-btn light" id="srsYouglish" aria-label="Ver no YouGlish">🎬</button>
+      </span>
+      <div class="srs-front">${card.front}</div>`;
+    if(srsShowingBack){
+      html += `<div class="srs-back">${card.back}</div>`;
+    } else {
+      html += `<button class="srs-show-btn" id="srsShowBtn">Mostrar resposta</button>`;
+    }
+    html += `</div>`;
+    if(srsShowingBack){
+      html += `<div class="srs-rate-row">
+        <button class="srs-rate-btn again" data-rating="again">Errei<small>ver de novo</small></button>
+        <button class="srs-rate-btn hard" data-rating="hard">Difícil<small>curto</small></button>
+        <button class="srs-rate-btn good" data-rating="good">Bom<small>normal</small></button>
+        <button class="srs-rate-btn easy" data-rating="easy">Fácil<small>mais longe</small></button>
+      </div>`;
+    }
+    html += `<div class="srs-progress">${remaining} card${remaining===1?'':'s'} restante${remaining===1?'':'s'} nesta sessão</div>`;
+    wrap.innerHTML = html;
+
+    document.getElementById('srsSpeak').addEventListener('click', ()=>speak(card.front));
+    document.getElementById('srsYouglish').addEventListener('click', ()=>openYouglish(card.front));
+    const showBtn = document.getElementById('srsShowBtn');
+    if(showBtn) showBtn.addEventListener('click', ()=>{ srsShowingBack = true; renderSrs(); });
+    wrap.querySelectorAll('.srs-rate-btn').forEach(btn=>{
+      btn.addEventListener('click', async ()=>{
+        if(!srsExtraMode) scheduleCard(card.id, btn.dataset.rating);
+        if(btn.dataset.rating==='again' && !srsExtraMode){
+          srsQueue.shift();
+          srsQueue.splice(Math.min(srsQueue.length,3),0,card);
+        } else {
+          srsQueue.shift();
+        }
+        srsShowingBack = false;
+        if(!srsExtraMode) await saveState();
+        if(srsQueue.length===0) srsExtraMode = false;
+        renderSrs();
+      });
+    });
+  }
+
+  document.getElementById('resetBtn').addEventListener('click', async ()=>{
+    if(!confirm('Isso vai apagar todo o seu progresso salvo. Continuar?')) return;
+    state.checklist = {}; await saveState(); render();
+  });
+
+  document.getElementById('retrySaveBtn').addEventListener('click', ()=>{ saveState(); });
+
+  loadState();
+})();
+</script>
+</body>
+</html>
